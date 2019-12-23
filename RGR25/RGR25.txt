@@ -1,0 +1,218 @@
+CREATE TABLE Worker
+	(ID_Workers INT IDENTITY PRIMARY KEY,
+	Name_Surname varchar(60),
+	ID_Category int,
+	ID_Workshop int,
+	
+	Salary int)
+
+CREATE TABLE Category_of_details
+	(ID_Category INT IDENTITY PRIMARY KEY,
+	Name_Category varchar(60),
+	Price int)
+
+CREATE TABLE Supply
+	(ID_Supply INT IDENTITY PRIMARY KEY,
+	City VARCHAR(60) NOT NULL,
+	Quantity int,
+	ID_Workshop int)
+
+CREATE TABLE Workshop
+	(ID_Workshop INT IDENTITY PRIMARY KEY,
+	Name_Workshop varchar(60),
+	Quanity_of_Item int,
+	Fund_zp int)
+
+CREATE TABLE Quanity_of_details
+	(ID_Workers int,
+	Quanity_of_details int,
+	KTU float)
+
+
+ALTER TABLE Supply
+ADD CONSTRAINT key1 FOREIGN KEY(ID_Workshop) 
+REFERENCES Workshop(ID_Workshop)
+ON DELETE CASCADE;
+
+ALTER TABLE Worker
+ADD CONSTRAINT key2 FOREIGN KEY(ID_Workshop) 
+REFERENCES Workshop(ID_Workshop)
+ON DELETE CASCADE;
+
+ALTER TABLE Worker
+ADD CONSTRAINT key3 FOREIGN KEY(ID_Category) 
+REFERENCES  Category_of_details(ID_Category)
+ON DELETE CASCADE;
+
+ALTER TABLE Quanity_of_details
+ADD CONSTRAINT key4 FOREIGN KEY(ID_Workers) 
+REFERENCES  Worker(ID_Workers)
+ON DELETE CASCADE;
+
+
+INSERT INTO Category_of_details VALUES('for car', 500);
+INSERT INTO Category_of_details VALUES('for home', 200);
+INSERT INTO Category_of_details VALUES('for army', 1000);
+INSERT INTO Category_of_details VALUES('for PK', 600);
+INSERT INTO Category_of_details VALUES('for factory', 400);
+
+INSERT INTO Workshop VALUES('First',200, Null);
+INSERT INTO Workshop VALUES('Second',1000, Null);
+INSERT INTO Workshop VALUES('Third',60, Null);
+INSERT INTO Workshop VALUES('Fourth',200, Null);
+INSERT INTO Workshop VALUES('Fifth',500, Null);
+
+INSERT INTO Supply VALUES('Dnepr', 100, 1);
+INSERT INTO Supply VALUES('Kiew', 50, 1);
+INSERT INTO Supply VALUES('Donetsk', 10, 1);
+INSERT INTO Supply VALUES('Dnepr', 600, 2);
+INSERT INTO Supply VALUES('Kiew', 150, 2);
+INSERT INTO Supply VALUES('Dnepr', 250, 2);
+INSERT INTO Supply VALUES('Lviv', 20, 3);
+INSERT INTO Supply VALUES('Kharkov', 10, 3);
+INSERT INTO Supply VALUES('Dnepr', 6, 3);
+INSERT INTO Supply VALUES('Lviv', 70, 4);
+INSERT INTO Supply VALUES('Kharkov', 69, 4);
+INSERT INTO Supply VALUES('Dnepr', 32, 4);
+INSERT INTO Supply VALUES('Donetsk', 300, 5);
+INSERT INTO Supply VALUES('Kharkov', 20, 5);
+INSERT INTO Supply VALUES('Lviv', 80, 5);
+
+INSERT INTO Worker VALUES('Vlad Chornii', 1, 1, Null);
+INSERT INTO Worker VALUES('Krestovozdvizhen Alfey', 1, 1, Null);
+INSERT INTO Worker VALUES('Bedarev Prov', 1, 1,  Null);
+INSERT INTO Worker VALUES('Gubastov Hariton', 2, 2,  Null);
+INSERT INTO Worker VALUES('Poltev Ionafan', 2, 2,  Null);
+INSERT INTO Worker VALUES('Shhurov Ahilla', 2, 2, Null);
+INSERT INTO Worker VALUES('Korolenko Arseniy', 3, 3, Null);
+INSERT INTO Worker VALUES('Denisov Agafodor', 3, 3, Null);
+INSERT INTO Worker VALUES('Chaplin Gerbert', 3, 3, Null);
+INSERT INTO Worker VALUES('Pozdeev Tertiy', 4, 4, Null);
+INSERT INTO Worker VALUES('Ruzhinskiy Avenir', 4, 4, Null);
+INSERT INTO Worker VALUES('Karabchevskiy Kuzma', 4, 4, Null);
+INSERT INTO Worker VALUES('Gorlov Feklist', 5, 5, Null);
+INSERT INTO Worker VALUES('Karachinskiy Miroslav', 5, 5, Null);
+INSERT INTO Worker VALUES('Adlerberg Gavriil', 5, 5, Null);
+
+INSERT INTO Quanity_of_details VALUES(1, 50,NULL);
+INSERT INTO Quanity_of_details VALUES(2, 100,NULL);
+INSERT INTO Quanity_of_details VALUES(3, 50,NULL);
+INSERT INTO Quanity_of_details VALUES(4, 500,NULL);
+INSERT INTO Quanity_of_details VALUES(5, 400,NULL);
+INSERT INTO Quanity_of_details VALUES(6, 100,NULL);
+INSERT INTO Quanity_of_details VALUES(7, 30,NULL);
+INSERT INTO Quanity_of_details VALUES(8, 20,NULL);
+INSERT INTO Quanity_of_details VALUES(9, 10,NULL);
+INSERT INTO Quanity_of_details VALUES(10, 100,NULL);
+INSERT INTO Quanity_of_details VALUES(11, 50,NULL);
+INSERT INTO Quanity_of_details VALUES(12, 50,NULL);
+INSERT INTO Quanity_of_details VALUES(13, 300,NULL);
+INSERT INTO Quanity_of_details VALUES(14, 100,NULL);
+INSERT INTO Quanity_of_details VALUES(15, 100,NULL);
+
+
+
+------
+1.1 фамилия сборщика – наименование цеха – количество изделий по категориям, собранных рабочим за месяц
+
+Select Name_Surname, Name_Workshop, Quanity_of_details, Name_Category from Worker
+inner join Category_of_details on Worker.ID_Category = Category_of_details.ID_Category
+inner join Workshop on Worker.ID_Workshop = Workshop.ID_Workshop
+inner join Quanity_of_details on Worker.ID_Workers = Quanity_of_details.ID_Workers
+order by Name_Category
+
+1.2
+
+Select Name_Surname, Salary, Name_Category from Worker
+inner join Category_of_details on Worker.ID_Category = Category_of_details.ID_Category
+order by Name_Category
+
+1.3
+
+create procedure s1 @Id_workers int as
+declare @a float = (Select Quanity_of_details from Quanity_of_details  where ID_Workers = @Id_workers)
+declare @d int = (select ID_Workshop from Worker where ID_Workers = @Id_workers)
+declare @b float = (Select Quanity_of_Item from Workshop where ID_Workshop = @d)
+
+declare @c float = ((@a/@b)*100)
+begin
+
+Update Quanity_of_details  set KTU = @c where ID_Workers = @Id_workers
+
+end
+
+exec s1 15
+
+2.
+
+create procedure for_salary @ID_Workshop int as
+declare @b int =(Select Price from Category_of_details
+where Category_of_details.ID_Category =  @ID_workshop)
+declare @a int =(Select Quanity_of_Item from Workshop
+where ID_Workshop = @ID_workshop)
+
+declare @e int = (@a*@b)
+begin
+
+Update Workshop set Fund_zp = @e where ID_Workshop = @ID_Workshop
+end
+
+exec for_salary 5
+
+3.1
+
+CREATE PROCEDURE new_city @Supply_id INT, @City varchar(60) AS
+BEGIN
+	UPDATE Supply SET City = @City where ID_Supply = @Supply_id
+END
+
+exec new_city 1, 'Vlad lox'
+
+3.2
+
+CREATE PROCEDURE new_Quantity @Supply_id INT, @Quantity int AS
+BEGIN
+	UPDATE Supply SET Quantity = @Quantity where ID_Supply = @Supply_id
+END
+
+exec new_Quantity 1, 99
+
+
+4.1
+Create procedure salary_for_rabotnik @ID_worker int as
+declare @a float = (Select KTU from Quanity_of_details where ID_Workers = @ID_worker)
+declare @b int = (Select Fund_zp from Worker 
+inner join Workshop on Worker.ID_Workshop = Workshop.ID_Workshop where ID_Workers = @ID_worker)
+declare @c int =((@a / 100)*@b)
+begin
+Update Worker set Salary = @c where ID_Workers = @ID_worker
+end
+
+exec salary_for_rabotnik 8
+
+4.2
+
+
+create view topchik as
+Select Name_Surname, max(KTU) as top1 from Quanity_of_details
+inner join Worker on Quanity_of_details.ID_Workers = Worker.ID_Workers
+group by Name_Surname
+having  max(KTU) >= all(Select max(KTU) from Quanity_of_details
+group by ID_Workers)
+
+select * from topchik
+
+4.3
+
+Select Name_Workshop, Quanity_of_Item from Workshop
+order by Quanity_of_Item desc
+
+
+
+
+
+
+
+
+
+

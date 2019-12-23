@@ -1,0 +1,189 @@
+-----Создание таблиц----
+CREATE TABLE criminal_code
+	(ID_article INT IDENTITY PRIMARY KEY,
+	Name_Article VARCHAR(60),
+	min_term Int,
+	max_term Int)
+
+CREATE TABLE People
+	(Id_People INT IDENTITY PRIMARY KEY,
+	Name_Surname varchar(60),
+	Date_of_birthday date,
+	Number_Camera int)
+
+CREATE TABLE Criminal_case
+	(ID_Criminal_case INT IDENTITY PRIMARY KEY,
+	Id_People int,
+	ID_article INT,
+	Date_Start date,
+	Date_End date,
+	fee int,
+	years_in_prison int)
+
+
+----Связи и ограничения-----
+
+ALTER TABLE Criminal_case
+ADD CONSTRAINT key1 FOREIGN KEY(ID_article) 
+REFERENCES criminal_code(ID_article)
+ON DELETE CASCADE;
+
+ALTER TABLE Criminal_case
+ADD CONSTRAINT key2 FOREIGN KEY(Id_People) 
+REFERENCES People(Id_People)
+ON DELETE CASCADE;
+
+ALTER TABLE Criminal_case
+ADD CONSTRAINT Criminal_cases_check
+	CHECK (Date_Start < Date_End);
+
+	ALTER TABLE Criminal_case
+ADD CONSTRAINT Date_End_check
+	CHECK (Date_End < getdate());
+
+-----Заполнение-----
+
+INSERT INTO People VALUES('Bronevskiy Svetozar', '1965-12-20', 0);
+INSERT INTO People VALUES('Stroev Falaley', '1970-06-04', 1);
+INSERT INTO People VALUES('Burkov Protasiy', '1970-09-25', 0);
+INSERT INTO People VALUES('Gubin Boleslav', '1973-12-19', 2);
+INSERT INTO People VALUES('Vorobyov Rem', '1974-04-30', 2);
+INSERT INTO People VALUES('Raslovlev Vonifatiy', '1975-01-31', 3);
+INSERT INTO People VALUES('Nekrasov Kasyan', '1975-05-08', 3);
+INSERT INTO People VALUES('Nazarevskiy Angelin', '1981-07-21', 4);
+INSERT INTO People VALUES('Bolotin Gay', '1988-05-11', 4);
+INSERT INTO People VALUES('Bazanin Hrisanf', '1992-01-31', 3);
+INSERT INTO People VALUES('Kolzakov Frontasiy', '1993-09-08', 1);
+INSERT INTO People VALUES('Zaharov Izyaslav', '1994-12-15', 0);
+
+
+INSERT INTO criminal_code VALUES('Revocation of a military or special title', 3,5);
+INSERT INTO criminal_code VALUES('Actions aimed at forceful change', 5,10);
+INSERT INTO criminal_code VALUES('High treason', 1,2);
+INSERT INTO criminal_code VALUES('Trespass against life', 5,15);
+INSERT INTO criminal_code VALUES('Sabotage', 20,25);
+INSERT INTO criminal_code VALUES('Espionage', 1,5);
+INSERT INTO criminal_code VALUES('Murder', 2,4);
+INSERT INTO criminal_code VALUES('Infanticide', 1,3);
+INSERT INTO criminal_code VALUES('Negligent homicide', 2,7);
+INSERT INTO criminal_code VALUES('Driving a person into suicide', 5,9);
+INSERT INTO criminal_code VALUES('Intended minor bodily injury', 1,6);
+
+INSERT INTO Criminal_case VALUES(2, 5,'2017-04-11', '2017-11-06', 1000,20);
+INSERT INTO Criminal_case VALUES(11, 5,'2017-10-20', '2017-12-06', 6000,25);
+INSERT INTO Criminal_case VALUES(1, 8,'2017-03-07', '2017-04-25', 10000,1);
+INSERT INTO Criminal_case VALUES(3, 6,'2017-05-05', '2017-08-28', 7000,1);
+INSERT INTO Criminal_case VALUES(12, 3,'2017-10-06', '2017-10-11', 5000,1);
+INSERT INTO Criminal_case VALUES(4, 1,'2018-03-27', '2018-06-28', 5000,4);
+INSERT INTO Criminal_case VALUES(5, 2,'2018-06-04', '2018-07-06', 6000,7);
+INSERT INTO Criminal_case VALUES(9, 11,'2018-08-03', '2018-12-20', 6000,6);
+INSERT INTO Criminal_case VALUES(7, 7,'2018-10-02', '2019-02-01', 4000,3);
+INSERT INTO Criminal_case VALUES(8, 9,'2019-03-19', '2019-04-01', 3000,5);
+INSERT INTO Criminal_case VALUES(6, 10,'2019-03-21', '2019-05-01', 9000,5);
+INSERT INTO Criminal_case VALUES(9, 4,'2019-09-09', '2019-09-26', 8000,5);
+
+1.1
+
+SELECT ID_Criminal_case, Name_Surname, Date_of_birthday, Name_Article FROM People
+inner join Criminal_case on People.Id_People = Criminal_case.Id_People
+inner join criminal_code on Criminal_case.ID_article = criminal_code.ID_article
+order by ID_Criminal_case 
+
+1.2 
+
+SELECT ID_Criminal_case, Name_Surname, Date_of_birthday, Name_Article FROM People
+inner join Criminal_case on People.Id_People = Criminal_case.Id_People
+inner join criminal_code on Criminal_case.ID_article = criminal_code.ID_article
+WHERE DATEDIFF(YEAR, Date_of_birthday, GETDATE()) < 18
+
+1.3
+
+SELECT ID_Criminal_case, Name_Surname, Date_of_birthday, Name_Article FROM People
+inner join Criminal_case on People.Id_People = Criminal_case.Id_People
+inner join criminal_code on Criminal_case.ID_article = criminal_code.ID_article
+WHERE max_term >= 10
+
+2.1 
+
+CREATE PROCEDURE Are_in_Camera @Name1 VARCHAR(60), @Name2 VARCHAR(60) AS 
+BEGIN
+	declare @Camera1 INT
+	declare @Camera2 INT
+	declare @CC1 INT
+	declare @CC2 INT
+
+	SET @Camera1 = (SELECT Number_Camera FROM People WHERE Name_Surname = @Name1)
+	SET @Camera2 = (SELECT Number_Camera FROM People WHERE Name_Surname = @Name2)
+
+	SET @CC1 = (SELECT criminal_code.ID_article FROM criminal_code
+	inner join Criminal_case on criminal_code.ID_article = Criminal_case.ID_article
+	inner join People on People.Id_People = Criminal_case.Id_People
+	WHERE Name_Surname = @Name1)
+
+	SET @CC2 = (SELECT criminal_code.ID_article FROM criminal_code
+	inner join Criminal_case on criminal_code.ID_article = Criminal_case.ID_article
+	inner join People on People.Id_People = Criminal_case.Id_People
+	WHERE Name_Surname = @Name2)
+
+	if (@CC1 = @CC2 and @Camera1 = @Camera2) 
+	begin
+		print 'Обвинувачені по одній статі сидять в одній камері!!!!!!'
+	end
+	else
+	begin
+		print 'Обвинувачені мають різні статі, або сидять в різних камерах'
+	end
+END
+
+exec Are_in_Camera 'Stroev Falaley', 'Kolzakov Frontasiy'
+exec Are_in_Camera 'Stroev Falaley', 'Bronevskiy Svetozar'
+
+DROP PROCEDURE Are_in_Camera
+
+2.2
+
+SELECT sum(fee) FROM Criminal_case
+WHERE DATEPART(year, GETDATE()) = DATEPART(year, Date_End)
+
+3.1 
+
+CREATE PROCEDURE Change_article @Id_Case INT, @New_Article INT as
+BEGIN
+	UPDATE Criminal_case SET ID_article = @New_Article WHERE ID_Criminal_case = @Id_Case
+END
+
+exec Change_article 13, 10
+
+DROP PROCEDURE Change_article
+
+4.1 
+
+CREATE VIEW Defensive as SELECT Name_Surname, Name_Article FROM People
+inner join Criminal_case on People.Id_People = Criminal_case.Id_People
+inner join criminal_code on Criminal_case.ID_article = criminal_code.ID_article
+
+SELECT * FROM Defensive
+
+DROP VIEW Defensive
+
+4.2 
+
+CREATE VIEW Protect as 
+SELECT ID_Criminal_case, Name_Surname, (max_term - years_in_prison) as 'max - real', 
+(years_in_prison - min_term) as 'real - min'
+FROM Criminal_case 
+inner join People on People.Id_People = Criminal_case.Id_People
+inner join criminal_code on criminal_code.ID_article = Criminal_case.ID_article
+
+SELECT * FROM Protect
+
+DROP VIEW Protect
+
+4.3
+
+CREATE VIEW List_of_cases AS
+SELECT ID_Criminal_case, ID_article FROM Criminal_case
+
+SELECT * FROM List_of_cases
+
+DROP VIEW List_of_cases

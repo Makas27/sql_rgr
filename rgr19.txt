@@ -1,0 +1,225 @@
+CREATE TABLE Groups
+	(ID_Groups INT IDENTITY PRIMARY KEY,
+	Name_Groups varchar(60))
+
+CREATE TABLE Students
+	(ID_Students INT IDENTITY PRIMARY KEY,
+	Name_Surname varchar(60),
+	ID_Groups int)
+
+CREATE TABLE Typ
+	(ID_Typ INT IDENTITY PRIMARY KEY,
+	Name_Typ VARCHAR(60) NOT NULL)
+
+CREATE TABLE Teacher
+	(ID_Teacher INT IDENTITY PRIMARY KEY,
+	FullName varchar(60))
+
+CREATE TABLE subjects
+	(ID_subjects INT IDENTITY PRIMARY KEY,
+	Name_subjects varchar(60),
+	ID_Teacher int,
+	ID_Typ INT)
+
+CREATE TABLE absenteeism
+	(ID_absenteeism INT IDENTITY PRIMARY KEY,
+	ID_Students INT,
+	ID_subjects INT,
+	date_absenteeism date,
+	semester int)
+
+
+
+
+ALTER TABLE Students
+ADD CONSTRAINT key1 FOREIGN KEY(ID_Groups) 
+REFERENCES Groups(ID_Groups)
+ON DELETE CASCADE;
+
+ALTER TABLE absenteeism
+ADD CONSTRAINT key2 FOREIGN KEY(ID_Students) 
+REFERENCES Students(ID_Students)
+ON DELETE CASCADE;
+
+ALTER TABLE absenteeism
+ADD CONSTRAINT key3 FOREIGN KEY(ID_subjects) 
+REFERENCES subjects(ID_subjects)
+ON DELETE CASCADE;
+
+ALTER TABLE subjects
+ADD CONSTRAINT key4 FOREIGN KEY(ID_Typ) 
+REFERENCES typ(ID_Typ)
+ON DELETE CASCADE;
+
+ALTER TABLE subjects
+ADD CONSTRAINT key5 FOREIGN KEY(ID_Teacher) 
+REFERENCES Teacher(ID_Teacher)
+ON DELETE CASCADE;
+
+
+
+insert into Typ values('lecture')
+insert into Typ values('practice')
+insert into Typ values('laboratory')
+
+insert into Teacher values('Polikarpov Emilian')
+insert into Teacher values('Yurevskiy Olimpiodor')
+insert into Teacher values('Shherba Ieremiya')
+insert into Teacher values('Poroshin Vissarion')
+insert into Teacher values('Uhtomskiy Makariy')
+
+insert into subjects values('Programming', 1,1)
+insert into subjects values('Physics', 2,2)
+insert into subjects values('Cybersecurity', 3,3)
+insert into subjects values('Cryptography', 4,3)
+insert into subjects values('History', 5,2)
+
+
+insert into Groups values('FB-74')
+insert into Groups values('FB-82')
+insert into Groups values('FB-93')
+
+insert into Students values('Voeczkiy Havst',1)
+insert into Students values('Arshinskiy Afinodor',1)
+insert into Students values('Shhepotev Makariy',1)
+insert into Students values('Merezhkovskiy Aron',1)
+insert into Students values('Batashev Martyan',2)
+insert into Students values('Varenczov Rufinian',2)
+insert into Students values('Mosolov Avgustin',2)
+insert into Students values('Vavravskiy Varfolomey',2)
+insert into Students values('Domeyko Foma',3)
+insert into Students values('Ozerov Kuzma',3)
+insert into Students values('Starzhinskiy Feodor',3)
+insert into Students values('Shahmatov Kuzma',3)
+
+
+insert into absenteeism values(1, 1, '2019-02-20', 1)
+insert into absenteeism values(2, 1, '2019-04-11', 1)
+insert into absenteeism values(3, 3, '2019-04-11', 1)
+insert into absenteeism values(6, 4, '2019-02-13', 2)
+insert into absenteeism values(7, 3, '2019-05-15', 2)
+insert into absenteeism values(4, 3, '2019-08-21', 2)
+insert into absenteeism values(5, 4, '2019-07-25', 3)
+insert into absenteeism values(8, 2, '2019-08-19', 3)
+insert into absenteeism values(10, 5, '2019-07-17', 3)
+insert into absenteeism values(7, 5, '2019-05-10', 4)
+insert into absenteeism values(7, 3, '2019-10-08', 4)
+insert into absenteeism values(4, 4, '2019-02-06', 4)
+insert into absenteeism values(11, 1, '2019-01-25', 5)
+insert into absenteeism values(5, 2, '2019-06-03', 5)
+insert into absenteeism values(11, 2, '2019-05-08', 5)
+insert into absenteeism values(1, 4, '2019-11-27', 6)
+insert into absenteeism values(12, 4, '2019-11-06', 6)
+insert into absenteeism values(11, 3, '2019-09-11', 6)
+insert into absenteeism values(1, 1, '2019-10-10', 1)
+insert into absenteeism values(2, 1, '2019-07-31', 1)
+
+
+1.1
+
+create view Students_groups as
+Select Name_Surname, Name_Groups from Students
+inner join Groups on Students.ID_Groups = Groups.ID_Groups
+
+select * from Students_groups
+
+1.2
+
+Select Name_Surname, Name_subjects, Name_Typ from absenteeism
+inner join Students on absenteeism.ID_Students = Students.ID_Students
+inner join subjects on absenteeism.ID_subjects = subjects.ID_subjects
+inner join Typ on subjects.ID_Typ = Typ.ID_Typ
+where absenteeism.ID_subjects = 4 and subjects.ID_Typ = 3
+
+
+1.3
+
+Select Name_Surname, Name_subjects, Name_Groups from absenteeism
+inner join Students on absenteeism.ID_Students = Students.ID_Students
+inner join subjects on absenteeism.ID_subjects = subjects.ID_subjects
+inner join Typ on subjects.ID_Typ = Typ.ID_Typ
+inner join Groups on Students.ID_Groups = Groups.ID_Groups
+where absenteeism.ID_subjects = 1 and Students.ID_Groups = 1 and semester in(1,3,5,7)
+
+
+2.1
+
+create procedure cout_progul @Groups int, @month int
+as
+begin
+Select count(absenteeism.ID_Students) from absenteeism
+inner join Students on absenteeism.ID_Students = Students.ID_Students
+inner join Groups on Students.ID_Groups = Groups.ID_Groups
+where Students.ID_Groups = @Groups and MONTH(date_absenteeism) = @month
+end
+
+exec cout_progul 1, 2
+
+2.2.1
+
+create procedure propuski_po_gruppe @Groups int
+as
+begin
+Select Name_Groups ,count(absenteeism.ID_Students) from absenteeism
+inner join Students on absenteeism.ID_Students = Students.ID_Students
+inner join Groups on Students.ID_Groups = Groups.ID_Groups
+where Students.ID_Groups = @Groups
+group by Name_Groups
+end
+
+exec propuski_po_gruppe 1
+
+
+2.2.2
+
+create procedure propuski_po_subjects @sub int
+as
+begin
+Select Name_subjects ,count(absenteeism.ID_Students) from absenteeism
+inner join Students on absenteeism.ID_Students = Students.ID_Students
+inner join Groups on Students.ID_Groups = Groups.ID_Groups
+inner join subjects on absenteeism.ID_subjects = subjects.ID_subjects
+where absenteeism.ID_subjects = @sub
+group by Name_subjects 
+end
+
+exec propuski_po_subjects 2
+
+3.1
+
+insert into absenteeism values(2, 1, '2018-07-31', 1)
+
+DELETE absenteeism WHERE (DATEDIFF(year, date_absenteeism, GETDATE())) = 1
+
+3.2
+
+CREATE PROCEDURE Change_teacher @Id_sub INT, @New_teacher INT as
+BEGIN
+	UPDATE subjects SET ID_Teacher = @New_teacher WHERE ID_subjects = @Id_sub
+END
+
+exec Change_teacher 1, 2
+
+4.1
+
+Select Name_subjects,Name_Groups, count(Name_Surname) as colic_progulov from absenteeism
+inner join Students on absenteeism.ID_Students = Students.ID_Students
+inner join subjects on absenteeism.ID_subjects = subjects.ID_subjects
+inner join Typ on subjects.ID_Typ = Typ.ID_Typ
+inner join Groups on Students.ID_Groups = Groups.ID_Groups
+group by subjects.Name_subjects, Groups.Name_Groups
+
+select count(ID_Students) from absenteeism
+
+4.2
+
+create view v_dekanat as
+select Name_Surname, count(Name_Surname) as tt from absenteeism
+inner join Students on absenteeism.ID_Students = Students.ID_Students
+group by Name_Surname
+
+select * from v_dekanat
+
+
+
+

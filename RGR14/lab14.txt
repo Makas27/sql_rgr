@@ -1,0 +1,322 @@
+CREATE TABLE Groups (
+	Id_Groups Int identity Primary Key,
+	GroupName Varchar(10)
+);
+
+CREATE TABLE Students (
+	Id_Students Int identity PRIMARY KEY,
+	Surname VARCHAR(15) NOT NULL,
+	Name VARCHAR(15) NOT NULL,
+	ID_Groups Int Not NULL,
+	CONSTRAINT fk_group_studID FOREIGN KEY (ID_Groups) 
+	REFERENCES Groups(ID_Groups) ON DELETE CASCADE
+);
+
+CREATE TABLE Results (
+	ResultID INT Identity PRIMARY KEY,
+	Result_Step Int,
+	ID_students Int Not NULL,
+	DateOfResults INT,
+	CHECK (dateOfResults between 2018 and 2019),
+	Semestr int,	
+	CONSTRAINT fk_2 FOREIGN KEY (ID_students) 
+	REFERENCES Students(ID_students) ON DELETE CASCADE
+);
+
+CREATE TABLE Result_Step (
+	ID_Result_Step INT Identity PRIMARY KEY,
+	Result int,
+	Step int
+	
+);
+
+ALTER TABLE Results 
+ADD CONSTRAINT key1 FOREIGN KEY(Result_Step) 
+REFERENCES Result_Step(ID_Result_Step)
+ON DELETE CASCADE;
+
+
+INSERT INTO Groups(GroupName) 
+	VALUES ('FB-71'), ( 'FB-72'), ('FB-73'), ('FB-74'), ('FE-71')
+
+INSERT INTO Students(Surname, [Name], ID_groups) 
+	VALUES ('Vasilchuk', 'Bogdan',  1),
+			('Romanchenko ', 'Oleksandr',1),
+			('Brovarchuk', 'Yuliya',1),
+			('Matveev','Sacha',2),
+			('Simonova', 'Margarita',2),
+			('Arkadiev','Semen',2),
+			('Yatsenyuk', 'Auguste',3),
+			('Dmitrenko','Ilia',3),
+			('Ustinova', 'Ulyana',3),
+			('Krukov','Kiril',4),
+			('Didovets', 'Ustin',4),
+			('Petrenko','Kiril',4),
+			('Titorenko','Oleg',5),
+			('Kondratev', 'Igor',5),
+			('Kirilenko','David',5);
+		
+
+INSERT INTO Results(Result_Step, ID_Students, DateOfResults, Semestr)
+     VALUES(2,1,2018, 1), (3, 2, 2018, 1),
+		(4, 5, 2018, 1), (3, 3, 2019, 2),
+		(2,	4, 2018, 1), (3, 8, 2019, 2),
+		(2, 15, 2018, 1), (2, 4,  2019,	2),
+		(4, 6, 2018, 1), (4, 2,	2019,	2),
+		(3, 3, 2018, 1), (4, 5, 2019, 2),
+		(3, 10, 2018, 1), (1, 7, 2019, 1),
+		(4, 8, 2018, 1);
+
+insert into Result_Step values(2, 0)
+insert into Result_Step values(3, 960)
+insert into Result_Step values(4, 1200)
+insert into Result_Step values(5, 1800)
+
+
+-----
+4lab
+
+1.
+Select [Name], Step, GroupName from Results
+inner join Students on Results.ID_students = Students.Id_Students
+inner join Groups on Students.ID_Groups = Groups.Id_Groups
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+order by GroupName
+
+
+2.
+Select [Name], GroupName, Result from Results
+inner join Students on Results.ID_students = Students.Id_Students
+inner join Groups on Students.ID_Groups = Groups.Id_Groups
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+where Result = 5
+
+3.
+Select GroupName, sum(Step) from Students
+inner join Groups on Groups.Id_Groups = Students.ID_Groups
+inner join Results on Students.Id_Students = Results.ID_students
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+group by GroupName
+
+
+-----
+5lab
+
+Select GroupName, sum(Step) from Students
+inner join Groups on Groups.Id_Groups = Students.ID_Groups
+inner join Results on Students.Id_Students = Results.ID_students
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+group by GroupName
+having sum(Step) >= all(Select sum(Step) from Students
+inner join Groups on Groups.Id_Groups = Students.ID_Groups
+inner join Results on Students.Id_Students = Results.ID_students
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+group by GroupName)
+
+-----
+6lab
+
+
+1.
+create view view1 as
+Select [Name], Step, GroupName from Results
+inner join Students on Results.ID_students = Students.Id_Students
+inner join Groups on Students.ID_Groups = Groups.Id_Groups
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+
+select * from view1
+
+
+
+2.
+create view view2 as
+Select [Name], GroupName, Result from Results
+inner join Students on Results.ID_students = Students.Id_Students
+inner join Groups on Students.ID_Groups = Groups.Id_Groups
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+where Result = 5
+
+select * from view2
+
+3.
+create view view3 as
+Select GroupName, sum(Step) as tt from Students
+inner join Groups on Groups.Id_Groups = Students.ID_Groups
+inner join Results on Students.Id_Students = Results.ID_students
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+group by GroupName
+
+select * from view3
+
+----
+7lab
+
+Alter Table Students add Step int
+
+CREATE PROCEDURE step @Id_stud int, @semestr int AS
+BEGIN
+	declare @b int
+	declare @Result int
+	Select @Result = (Select Result_Step from Results where ID_students = @Id_stud and Semestr = @Semestr)
+	SET @b = 
+		CASE
+			WHEN @Result = 1 THEN 0
+			WHEN @Result = 2 THEN 960
+			WHEN @Result = 3 THEN 1200
+			WHEN @Result = 4 THEN 1800
+		END;
+	IF @Result IS NULL
+		Print 'Students dont have Result'
+	ELSE
+		Update Students set Step = @b where ID_students = @Id_stud
+END;
+GO
+
+
+EXEC step 3, 1;
+
+
+-----
+8lab
+
+1.
+CREATE TRIGGER ProgressT
+   ON Results
+   FOR DELETE
+AS
+IF  EXISTS  ( SELECT 'TRUE' FROM DELETED WHERE Result_Step >= 0)
+BEGIN
+	RAISERROR('Student have STEP!!!',16,1);
+	ROLLBACK TRAN
+END
+
+insert into Results Values (Null, 11, 2019, 2)
+
+Delete from Results where ResultID = 15 -- тут будет агр
+
+Delete from Results where ResultID = 16 -- тут пропустит
+
+
+EXEC step 11, 2
+
+
+2.
+Create view for_trigger as
+Select Name, Surname, GroupName, Students.Step from Students
+Inner join Groups on Students.ID_Groups = Groups.Id_Groups
+inner join Results on Students.Id_Students = Results.ID_students
+inner join Result_Step on Results.Result_Step = Result_Step.ID_Result_Step
+where Result = 5
+
+
+create trigger update_zadr
+on Results
+for Update
+as
+IF(UPDATE(Id_Students) or UPDATE(Result_Step))
+begin
+select * from for_trigger
+end
+
+update Results set ID_students = 5 where ResultID = 12
+
+update Results set Result_Step = 2 where ResultID = 12
+
+
+-----
+9lab
+
+create login Igori
+with password = 'Igori',
+default_database = lab14;
+
+create login Jacki
+with password = 'Jacki',
+default_database = lab14;
+
+
+create user Jacki for login Jacki
+create user Igori for login Igori
+
+
+execute sp_addrolemember 'db_ddladmin', 'Jacki';	-- права админа
+execute sp_addrolemember 'db_ddladmin', 'Igori';
+
+grant execute on dbo.step to Jacki 
+
+
+grant select, insert on dbo.Groups to Igori;	
+
+grant select on dbo.Results to Jacki;
+
+
+
+USE master;         --То что существует мастер-ключ
+GO
+SELECT *
+FROM sys.symmetric_keys
+WHERE name = '##MS_ServiceMasterKey##';
+GO
+
+USE lab14; --Создаем новый мастер-ключ
+GO
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = '123';
+GO
+
+USE lab14; --Создаем новый сертификат
+GO
+CREATE CERTIFICATE Certificate_Lab9
+WITH SUBJECT = 'Protect Data';
+GO
+
+USE lab14;   -- Создание симетрического ключа 
+GO
+CREATE SYMMETRIC KEY SymmetricKey_lab9
+ WITH ALGORITHM = AES_128 
+ ENCRYPTION BY CERTIFICATE Certificate_lab9;
+GO
+
+USE lab14; -- Добавление колонки с типом varbinary
+GO
+ALTER TABLE Groups
+ADD Groups_encrypt varbinary(MAX) NULL
+GO
+
+USE lab14;
+GO
+-- Opens the symmetric key for use
+OPEN SYMMETRIC KEY SymmetricKey_lab9
+DECRYPTION BY CERTIFICATE Certificate_lab9;
+GO
+UPDATE Groups
+SET Groups_encrypt = EncryptByKey (Key_GUID('SymmetricKey_lab9'),GroupName)  --Зашифровка колонки таблицы
+FROM dbo.Groups;
+GO
+-- Closes the symmetric key
+CLOSE SYMMETRIC KEY SymmetricKey_lab9;
+GO
+
+
+
+USE lab14; --Расшифровка колонки таблицы
+GO
+OPEN SYMMETRIC KEY SymmetricKey_lab9
+DECRYPTION BY CERTIFICATE Certificate_lab9;
+GO
+-- Читання розшифрованих даних 
+SELECT 
+ID_Groups, Groups_encrypt AS 'Encrypted',
+CONVERT(varchar, DecryptByKey(Groups_encrypt)) 
+
+FROM dbo.Groups;
+ CLOSE SYMMETRIC KEY SymmetricKey_lab9;
+GO
+
+GRANT VIEW DEFINITION ON SYMMETRIC KEY::SymmetricKey_lab9 TO Igori; -- права доступа для Makas
+GO
+GRANT VIEW DEFINITION ON Certificate::Certificate_lab9 TO Igori;
+GO
+
+
+
+

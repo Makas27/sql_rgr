@@ -1,0 +1,136 @@
+----создание таблиц -----
+
+CREATE TABLE Author
+	(ID_Author INT IDENTITY PRIMARY KEY,
+	Name_Surname varchar(60))
+
+CREATE TABLE Notice
+	(ID_Notice INT IDENTITY PRIMARY KEY,
+	ID_Books int,
+	ID_Reader int,
+	Date_To_take date,
+	debt tinyint)
+
+CREATE TABLE Reader
+	(ID_Reader INT IDENTITY PRIMARY KEY,
+	Name_and_Surname VARCHAR(60) NOT NULL,
+	Work varchar(60),
+	Adress varchar(60))
+
+CREATE TABLE Books
+	(ID_Books INT IDENTITY PRIMARY KEY,
+	Book_title Varchar(60),
+	ID_Author int,
+	ID_Atheneum int)
+
+
+CREATE TABLE Atheneum
+	(ID_Atheneum Int IDENTITY PRIMARY KEY,
+	Adress_Library varchar(60)
+	)
+
+-----связи и ограничения-----
+
+ALTER TABLE Books
+ADD CONSTRAINT key1 FOREIGN KEY(ID_Author) 
+REFERENCES Author(ID_Author)
+ON DELETE CASCADE;
+
+ALTER TABLE  Notice
+ADD CONSTRAINT key2 FOREIGN KEY(ID_Reader) 
+REFERENCES Reader(ID_Reader)
+ON DELETE CASCADE;
+
+ALTER TABLE  Notice
+ADD CONSTRAINT key3 FOREIGN KEY(ID_Books) 
+REFERENCES Books(ID_Books)
+ON DELETE CASCADE;
+
+ALTER TABLE Books
+ADD CONSTRAINT key4 FOREIGN KEY(ID_Atheneum) 
+REFERENCES Atheneum(ID_Atheneum)
+ON DELETE CASCADE;
+
+
+
+
+ALTER TABLE Notice
+ADD CONSTRAINT Notice_check
+	CHECK (Date_To_take < getdate());
+
+----Заполнени таблиц-----
+INSERT INTO Atheneum VALUES('2498  Ridge Road');
+
+INSERT INTO Author VALUES('Flannery OConnor');
+INSERT INTO Author VALUES('Erica Jong');
+INSERT INTO Author VALUES('Thomas Keller');
+INSERT INTO Author VALUES('Jean Rhys');
+INSERT INTO Author VALUES('Paul Kalanithi');
+
+INSERT INTO Books VALUES('The Complete Stories', 1, 1);
+INSERT INTO Books VALUES('Letting Go', 2, 1);
+INSERT INTO Books VALUES('Fear of Flying', 4, 1);
+INSERT INTO Books VALUES('The French Laundry Cookbook', 5, 1);
+INSERT INTO Books VALUES('Wide Sargasso Sea', 3, 1);
+INSERT INTO Books VALUES('When Breath Becomes Air', 1, 1);
+INSERT INTO Books VALUES('GENESIS', 1, 1);
+INSERT INTO Books VALUES('The Manuscript Books of Emily Dickinson', 2, 1);
+INSERT INTO Books VALUES('A Girl Like I', 3, 1);
+INSERT INTO Books VALUES('In the Heart of the Sea', 5, 1);
+INSERT INTO Books VALUES('Little Women', 4, 1);
+INSERT INTO Books VALUES('Boy Wonder', 3, 1);
+INSERT INTO Books VALUES('It', 5, 1);
+INSERT INTO Books VALUES('The Phantom Tollbooth', 2, 1);
+INSERT INTO Books VALUES('A Prayer for the Dying', 4, 1);
+
+INSERT INTO Reader VALUES('Myasoedov Hristofor', 'Anesthesiologists', '524  Columbia Road');
+INSERT INTO Reader VALUES('Kirponos Oleg', 'Surgeons', '1170  Jim Rosa Lane');
+INSERT INTO Reader VALUES('Gnevashev Grigoriy', 'Gynecologists', '4785  Hillview Drive');
+INSERT INTO Reader VALUES('Adamovich Zenon', 'Obstetricians', '2091  Grant Street');
+INSERT INTO Reader VALUES('Gaevskiy Iustin', 'Psychiatrists', '4386  Austin Secret Lane');
+INSERT INTO Reader VALUES('Bestuzhev Avgustin', 'Obstetricians', '4510  Goldie Lane');
+INSERT INTO Reader VALUES('Netudyhata Nikandr', 'Psychiatrists', '2588  Lamberts Branch Road');
+INSERT INTO Reader VALUES('Goleevskiy Poluekt', 'Gynecologists', '2853  Hannah Street');
+INSERT INTO Reader VALUES('Leonovich Polievkt', 'Psychiatrists', '4588  Keyser Ridge Road');
+INSERT INTO Reader VALUES('Belenkov Vyacheslav', 'Chief Executives', '1261  Apple Lane');
+INSERT INTO Reader VALUES('Buyalskiy Kuzma', 'Systems Mangers', '4295  Fairmont Avenue');
+INSERT INTO Reader VALUES('Vakulin Panfil', 'Airline Pilots', '1475  Reeves Street');
+INSERT INTO Reader VALUES('Hrapov Gerasim', 'Surgeons', '3085  Jessie Street');
+INSERT INTO Reader VALUES('Krukoveczkiy Ignatiy', 'Systems Mangers', '3055  Jessie Street');
+INSERT INTO Reader VALUES('Vaharlovskiy Aksentiy', 'Systems Mangers', '551  Adamsville Road');
+INSERT INTO Reader VALUES('Baychurov Agafodor', 'Chief Executives', '3021  Myra Street');
+INSERT INTO Reader VALUES('Neofitov Irakliy', 'Obstetricians', '1902  Barnes Street');
+INSERT INTO Reader VALUES('Narkevich Askold', 'Lawyers', '3290  Washburn Street');
+INSERT INTO Reader VALUES('Vremev Oleg', 'Surgeons', '3375  Elm Drive');
+INSERT INTO Reader VALUES('Gorstkin Ieremiya', 'Lawyers', '600  Chandler Hollow Road');
+
+INSERT INTO Notice VALUES(1, 1, '2017-08-17', Null);
+INSERT INTO Notice VALUES(2, 3, '2017-09-01', Null);
+INSERT INTO Notice VALUES(4, 5, '2017-10-17', Null);
+INSERT INTO Notice VALUES(6, 7, '2019-05-25', Null);
+INSERT INTO Notice VALUES(9, 9, '2019-04-20', Null);
+INSERT INTO Notice VALUES(10, 2, '2019-03-05', Null);
+INSERT INTO Notice VALUES(14, 14, '2019-11-29', Null);
+INSERT INTO Notice VALUES(15, 4, '2019-11-02', Null);
+INSERT INTO Notice VALUES(3, 6, '2019-01-07', Null);
+INSERT INTO Notice VALUES(5, 8, '2019-09-06', Null);
+INSERT INTO Notice VALUES(7, 10, '2019-09-06', Null);
+INSERT INTO Notice VALUES(8, 11, '2018-11-23', Null);
+INSERT INTO Notice VALUES(12, 13, '2019-02-27', Null);
+INSERT INTO Notice VALUES(11, 15, '2019-03-29', Null);
+INSERT INTO Notice VALUES(13, 20, '2019-06-19', Null);
+INSERT INTO Notice VALUES(1, 12, '2019-06-28', Null);
+INSERT INTO Notice VALUES(15, 16, '2019-11-14', Null);
+INSERT INTO Notice VALUES(4, 17, '2019-11-21', Null);
+INSERT INTO Notice VALUES(3, 18, '2019-11-28', Null);
+INSERT INTO Notice VALUES(2, 19, '2019-11-25', Null);
+
+
+
+
+
+
+
+
+
+

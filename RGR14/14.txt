@@ -1,0 +1,186 @@
+INSERT INTO Mainland VALUES('Asia', 0)
+INSERT INTO Mainland VALUES('Europa', 0)
+INSERT INTO Mainland VALUES('Africa', 0)
+INSERT INTO Mainland VALUES('South America', 0)
+INSERT INTO Mainland VALUES('North America', 0)
+INSERT INTO Mainland VALUES('Australia', 0)
+
+INSERT INTO Ñurrency VALUES('grn')
+INSERT INTO Ñurrency VALUES('euro')
+
+INSERT INTO Ñurrency VALUES('yuan')
+INSERT INTO Ñurrency VALUES('yen')
+INSERT INTO Ñurrency VALUES('rupee')
+
+INSERT INTO Ñurrency VALUES('rand')
+INSERT INTO Ñurrency VALUES('franc')
+INSERT INTO Ñurrency VALUES('pound')
+
+INSERT INTO Ñurrency VALUES('dollar USA')
+INSERT INTO Ñurrency VALUES('dollar Canada')
+INSERT INTO Ñurrency VALUES('peso')
+
+INSERT INTO Ñurrency VALUES('arg peso')
+INSERT INTO Ñurrency VALUES('real')
+INSERT INTO Ñurrency VALUES('urg peso')
+
+INSERT INTO Ñurrency VALUES('dollar Australia')
+
+INSERT INTO Ñountry VALUES('Ukraine', 0, 1, 2, 42220000)
+INSERT INTO Ñountry VALUES('France', 0, 2, 2, 66990000)
+INSERT INTO Ñountry VALUES('Ukraine', 0, 2, 2, 8822000)
+
+INSERT INTO Ñountry VALUES('Chine', 0, 3, 1, 1386000000)
+INSERT INTO Ñountry VALUES('Japan', 0, 4, 1, 126800000)
+INSERT INTO Ñountry VALUES('India', 0, 5, 1, 1339000000)
+
+INSERT INTO Ñountry VALUES('South Africa', 0, 6, 3, 56720000)
+INSERT INTO Ñountry VALUES('Kongo', 0, 7, 3, 4233063)
+INSERT INTO Ñountry VALUES('Egypt', 0, 8, 3, 97550000)
+
+INSERT INTO Ñountry VALUES('USA', 0, 9, 4, 327200000)
+INSERT INTO Ñountry VALUES('Kanada', 0, 10, 4, 37590000)
+INSERT INTO Ñountry VALUES('Mexica', 0, 11, 4, 129200000)
+
+INSERT INTO Ñountry VALUES('Argentina', 0, 12, 5, 44270000)
+INSERT INTO Ñountry VALUES('Brazil', 0, 13, 5, 209300000)
+INSERT INTO Ñountry VALUES('Urugvay', 0, 14, 5, 3457000)
+
+INSERT INTO Ñountry VALUES('Australia', 0, 15, 6, 24600000)
+
+INSERT INTO Town VALUES('Kiev', 1, 1, 3547683)
+INSERT INTO Town VALUES('Jitomir', 0, 1, 10000)
+INSERT INTO Town VALUES('Lviv', 0, 1, 12312)
+
+INSERT INTO Town VALUES('Paris', 1, 2, 3547683)
+INSERT INTO Town VALUES('Lion', 0, 2, 1000)
+INSERT INTO Town VALUES('Marcel', 0, 2, 1234234)
+
+INSERT INTO Town VALUES('Viena', 1, 3, 234683)
+
+INSERT INTO Town VALUES('Pekin', 1, 4, 123123123)
+INSERT INTO Town VALUES('Shanhai', 0, 4, 23422345)
+
+INSERT INTO Town VALUES('Tokio', 1, 5, 222383)
+
+INSERT INTO Town VALUES('Deli', 1, 6, 23433683)
+
+INSERT INTO Town VALUES('Keyptaun', 1, 7, 23463)
+
+INSERT INTO Town VALUES('Brazzavil', 1, 8, 2342263)
+
+INSERT INTO Town VALUES('Kair', 1, 9, 23123)
+INSERT INTO Town VALUES('Gisa', 0, 9, 567463)
+
+INSERT INTO Town VALUES('Washington', 1, 10, 873454)
+INSERT INTO Town VALUES('NY', 0, 10, 345234)
+INSERT INTO Town VALUES('NJ', 0, 10, 234453)
+
+INSERT INTO Town VALUES('Ottava', 1, 11, 3443253)
+INSERT INTO Town VALUES('Vankuver', 0, 11, 234453)
+
+INSERT INTO Town VALUES('Mexiko', 1, 12, 234453)
+
+INSERT INTO Town VALUES('Buenes-Aires', 1, 13, 242353)
+INSERT INTO Town VALUES('Salta', 0, 13, 213453)
+
+INSERT INTO Town VALUES('Brazilia', 1, 14, 2975043)
+INSERT INTO Town VALUES('San-Paulu', 0, 14, 538443)
+
+INSERT INTO Town VALUES('Montevideo', 1, 15, 512333)
+
+INSERT INTO Town VALUES('Kanberra', 1, 16, 9059433)
+INSERT INTO Town VALUES('Sidney', 0, 16, 234566)
+
+UPDATE dbo.Ñountry SET ID_Capital = (SELECT ID_Town FROM Town 
+WHERE Ñountry.ID_Ñountry = Town.Id_Ñountry AND Town.Capital = 1)
+
+1.1
+
+CREATE VIEW Mainland_inh AS SELECT Name_Mainland, Number_of_inhabitants_Mainland FROM Mainland
+
+SELECT * FROM Mainland_inh
+
+DROP VIEW Mainland_inh
+
+1.2 
+
+CREATE VIEW Millioners AS SELECT Name_Town FROM Town WHERE Number_of_inhabitants_Town > 1000000
+
+SELECT * FROM Millioners
+
+DROP VIEW Millioners
+
+1.3
+
+CREATE VIEW Big_Asian_City AS SELECT Name_Town FROM Town 
+inner join Ñountry ON Town.Id_Ñountry = Ñountry.ID_Ñountry
+inner join Mainland ON Ñountry.ID_Mainland = Mainland.ID_Mainland
+WHERE Mainland.Name_Mainland = 'Asia' AND Town.Number_of_inhabitants_Town > 1000000
+
+SELECT * FROM Big_Asian_City
+
+DROP VIEW Big_Asian_City
+
+2.1 
+
+CREATE PROCEDURE Big_Cisy_Count @Conutry VARCHAR(60) AS
+BEGIN 
+	SELECT Count(ID_Town) FROM Town WHERE Town.Id_Ñountry 
+	= (SELECT ID_Ñountry FROM Ñountry WHERE Name_Ñountry = @Conutry) AND Number_of_inhabitants_Town > 1000000
+END
+
+DROP PROCEDURE Big_Cisy_Count 
+
+exec Big_Cisy_Count Ukraine
+
+2.2
+
+CREATE PROCEDURE Main_count @Mainland VARCHAR(60) AS
+BEGIN 
+	SELECT Number_of_inhabitants_Mainland FROM Mainland WHERE Name_Mainland = @Mainland
+END 
+
+exec Main_count Asia
+
+DROP PROCEDURE Main_count 
+
+3.1 
+
+DELETE Town WHERE Town.Number_of_inhabitants_Town < 100000
+
+3.2 
+
+CREATE PROCEDURE New_Cap @Country VARCHAR(60), @New_cap VARCHAR(60) as
+BEGIN
+	UPDATE Town SET Name_Town = @New_cap WHERE Town.ID_Town = 
+	(SELECT ID_Capital FROM dbo.Ñountry WHERE Name_Ñountry = @Country)
+END
+
+exec New_Cap 'France', 'New_name'
+
+SELECT * FROM Town
+
+DROP PROCEDURE New_Cap
+
+4.1 
+
+SELECT Name_Mainland, Name_Ñountry, Name_Town, Name_Ñurrency, Number_of_inhabitants_Country FROM dbo.Ñountry
+inner join Town on dbo.Ñountry.ID_Capital = Town.ID_Town
+inner join dbo.Ñurrency on dbo.Ñountry.ID_Ñurrency = dbo.Ñurrency.ID_Ñurrency
+inner join Mainland on dbo.Ñountry.ID_Mainland = Mainland.ID_Mainland 
+order by Mainland.Name_Mainland
+
+
+4.2 
+
+CREATE VIEW European_Caps as SELECT Name_Town FROM Town 
+inner join Ñountry on Town.ID_Town = dbo.Ñountry.ID_Capital
+inner join Mainland on Ñountry.ID_Mainland = Mainland.ID_Mainland
+Where Mainland.Name_Mainland = 'Europa'
+
+SELECT * FROM European_Caps
+
+DROP VIEW European_Caps
+
+

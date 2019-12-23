@@ -1,0 +1,42 @@
+CREATE TABLE Сountry
+	(ID_Сountry INT IDENTITY PRIMARY KEY,
+	Name_Сountry varchar(60), ---- Тут по 3 страны из каждого материка
+	ID_Capital int,
+	ID_Сurrency int,
+	ID_Mainland int,
+	Number_of_inhabitants_Country int) ---- сумма людей всех городов данной страны. Должна быть хоть 1 страна где меньше 100000тыс людей
+
+
+CREATE TABLE Сurrency 
+	(ID_Сurrency  INT IDENTITY PRIMARY KEY,
+	Name_Сurrency  varchar(60))
+
+
+CREATE TABLE Mainland
+	(ID_Mainland INT IDENTITY PRIMARY KEY,
+	Name_Mainland varchar(60), ---- Тут Азия, Европа, Америка 1, Америка 2, Автралия, Африка
+	Number_of_inhabitants_Mainland int) ----сумма всех людей из стран этого метерика материку
+
+
+CREATE TABLE Town
+	(ID_Town INT IDENTITY PRIMARY KEY,
+	Name_Town varchar(60), --- тут по 3 города из каждой страны. 1 столица и еще 2 каких то
+	Capital tinyint, ---- тут или 1 или 0. 1-столица, 0-просто город
+	Id_Сountry int)
+
+
+
+ALTER TABLE Town
+ADD CONSTRAINT key1 FOREIGN KEY(ID_Сountry) 
+REFERENCES  Сountry(ID_Сountry)
+ON DELETE CASCADE;
+
+ALTER TABLE Сountry
+ADD CONSTRAINT key2 FOREIGN KEY(ID_Сurrency) 
+REFERENCES  Сurrency(ID_Сurrency)
+ON DELETE CASCADE;
+
+ALTER TABLE Сountry
+ADD CONSTRAINT key3 FOREIGN KEY(ID_Mainland) 
+REFERENCES  Mainland(ID_Mainland)
+ON DELETE CASCADE;

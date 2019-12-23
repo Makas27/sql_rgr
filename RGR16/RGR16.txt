@@ -1,0 +1,200 @@
+----создание таблиц -----
+
+CREATE TABLE district
+	(ID_district INT IDENTITY PRIMARY KEY,
+	Name_district varchar(60))
+
+CREATE TABLE apartment
+	(ID_apartment INT IDENTITY PRIMARY KEY,
+	apartment_adress varchar(60),
+	apartment_floor int,
+	ID_district int,
+	apartment_square int,
+	number_of_rooms int,
+	Price int)
+
+CREATE TABLE request
+	(ID_request INT IDENTITY PRIMARY KEY,
+	ID_client int,
+	ID_apartment INT,
+	Type_request varchar(60),
+	date_request date,
+	date_ready date)
+
+CREATE TABLE client
+	(ID_client INT IDENTITY PRIMARY KEY,
+	Name_Surname Varchar(60),
+	Telefon_number int,
+	Adress_client varchar(60))
+
+
+-----связи-----
+
+ALTER TABLE request
+ADD CONSTRAINT key1 FOREIGN KEY(ID_client) 
+REFERENCES client(ID_client)
+ON DELETE CASCADE;
+
+ALTER TABLE request
+ADD CONSTRAINT key2 FOREIGN KEY(ID_apartment) 
+REFERENCES apartment(ID_apartment)
+ON DELETE CASCADE;
+
+ALTER TABLE apartment
+ADD CONSTRAINT key3 FOREIGN KEY(ID_district) 
+REFERENCES district(ID_district)
+ON DELETE CASCADE;
+
+-----заполнение----
+
+Insert into district values('Brooklyn')
+Insert into district values('Queens')
+Insert into district values('Bronx')
+Insert into district values('Manhattan')
+Insert into district values('Staten Island')
+
+
+Insert into apartment values('999  Carter Street', 7, 5, 450, 6,100000)
+Insert into apartment values('3582  D Street', 16, 4, 560, 3,60000)
+Insert into apartment values('4848  Emeral Dreams Drive', 24, 3, 400, 4,50000)
+Insert into apartment values('3927  Hinkle Deegan Lake Road', 55, 2, 250, 3,20000)
+Insert into apartment values('3037  Star Trek Drive', 31, 1, 90, 2,60000)
+Insert into apartment values('558  Moonlight Drive', 2, 4, 100, 1,10000)
+Insert into apartment values('3123  Roguski Road', 10, 5, 60, 1,9000)
+Insert into apartment values('2430  Parkview Drive', 10, 2, 400, 8,1500000)
+Insert into apartment values('4436  Bee Street', 3, 3, 300, 5,200000)
+Insert into apartment values('1132  Owagner Lane', 4, 1, 500, 10,600000)
+
+
+Insert into client values('Artyuhov Bronislav', 0941346572, '3135  Ferry Street')
+Insert into client values('Shelehov Agafangel', 0942165473, '1251  Chardonnay Drive')
+Insert into client values('Shhepotev Gektor', 0942563741, '1648  Alpha Avenue')
+Insert into client values('Boryaev Samson', 0941267354, '2788  Mahlon Street')
+Insert into client values('Balakirev Yuliy', 0947145632, '2819  Mahlon Street')
+Insert into client values('Vatalin Evgraf', 0943456712, '2860  Plainfield Avenue')
+Insert into client values('Titov Nikolay', 0943146275, '1138  Clearview Drive')
+Insert into client values('Izvekov Vlad', 0941324756, '1419  Godfrey Road')
+Insert into client values('Fedotev Lazar', 0944735261, '525  Augusta Park')
+Insert into client values('Lasunskiy Aris', 0941325764, '3746  Stewart Street')
+
+
+Insert into request values(1, 5, 'sale', '2019-01-27', '2019-11-01')
+Insert into request values(2, 4, 'buy', '2019-01-28', '2019-05-20')
+Insert into request values(3, 3, 'sale', '2019-02-01', '2019-05-20')
+Insert into request values(4, 2, 'swap', '2019-02-11', '2019-05-26')
+Insert into request values(5, 1, 'sale', '2019-02-19', '2019-06-06')
+Insert into request values(6, 6, 'buy', '2019-03-06', '2019-05-20')
+Insert into request values(7, 10, 'buy', '2019-04-07', '2019-06-12')
+Insert into request values(8, 7, 'sale', '2019-04-08', '2019-11-19')
+Insert into request values(9, 8, 'buy', '2019-04-26', '2019-06-22')
+Insert into request values(10, 9, 'swap', '2019-04-27', '2019-11-10')
+
+1.1
+
+CREATE VIEW Name_square AS SELECT Name_Surname, apartment_square FROM client
+inner join request on request.ID_client = client.ID_client
+inner join apartment on apartment.ID_apartment = request.ID_request
+
+SELECT * FROM Name_square
+
+DROP VIEW Name_square
+
+1.2
+-- Угрпування за поверхом --
+SELECT ID_apartment, apartment_adress, apartment_floor, number_of_rooms FROM apartment
+order by apartment_floor 
+
+-- Угрупування за кількістю кімнат -- 
+SELECT ID_apartment, apartment_adress, apartment_floor, number_of_rooms FROM apartment
+order by number_of_rooms
+
+-- Поверхи і кількості кімнат -- 
+SELECT apartment_floor, sum(number_of_rooms) as number_of_rooms FROM apartment
+group by apartment_floor
+order by apartment_floor
+
+2.1
+
+SELECT AVG(Price) FROM apartment 
+WHERE number_of_rooms = 3
+
+2.2
+
+CREATE PROCEDURE Sum_for_district @Name VARCHAR(60) AS
+BEGIN
+	SELECT SUM(ID_request) FROM request
+	inner join apartment on request.ID_apartment = apartment.ID_apartment
+	inner join district on district.ID_district = apartment.ID_district
+	WHERE district.Name_district = @Name
+END
+
+exec Sum_for_district 'Queens'
+
+DROP PROCEDURE Sum_for_district
+
+3.1 
+
+DECLARE @TransactionName varchar(20) = 'Transaction1';  
+
+BEGIN TRAN @TransactionName  
+       DELETE request WHERE DATEDIFF(DAY, date_ready, GETDATE()) >= 0
+ROLLBACK TRAN @TransactionName;  
+
+3.2 
+
+CREATE PROCEDURE New_price @Client VARCHAR(60), @New_price INT AS
+BEGIN 
+	UPDATE apartment SET Price = @New_price
+	WHERE apartment.ID_apartment = (SELECT apartment.ID_apartment FROM apartment
+					inner join request on apartment.ID_apartment = request.ID_apartment
+					inner join client on request.ID_client = client.ID_client
+					WHERE client.Name_Surname = @Client)
+END
+
+exec New_price 'Artyuhov Bronislav', 1
+
+SELECT * FROM apartment
+
+DROP PROCEDURE New_price
+
+4.1 
+
+CREATE PROCEDURE Search_client @Phone INT AS 
+BEGIN 
+	SELECT * FROM client WHERE client.Telefon_number = @Phone
+END
+
+exec Search_client 942165473
+
+DROP PROCEDURE Search_client
+
+4.2 
+
+CREATE PROCEDURE Search_appartment @Num1 INT, @Num2 INT, @Name_district VARCHAR(60) AS 
+BEGIN 
+	SELECT * FROM apartment 
+		inner join district on apartment.ID_district = district.ID_district
+		WHERE district.Name_district = @Name_district
+		AND
+		apartment.apartment_square BETWEEN @Num1 AND @Num2
+END
+
+
+exec Search_appartment 400, 500, 'Queens'
+
+DROP PROCEDURE Search_appartment
+
+4.3
+
+SELECT ID_apartment, Name_district, number_of_rooms FROM apartment
+inner join district on apartment.ID_district = district.ID_district
+order by number_of_rooms
+
+4.4
+
+SELECT Name_Surname, Telefon_number, Adress_client, ID_request, Type_request, date_request FROM client
+inner join request on request.ID_client = client.ID_client
+WHERE ID_apartment = 1
+
+
+

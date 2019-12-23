@@ -1,0 +1,444 @@
+----Код-----
+CREATE TABLE EMPLOYEES
+	(ID_EMPLOYEES INT IDENTITY PRIMARY KEY,
+	FullName VARCHAR(60) NOT NULL,
+	ID_Position INT NOT NULL,
+	ID_Department INT NOT NULL)
+
+CREATE TABLE POSITION
+	(ID_Position INT IDENTITY PRIMARY KEY,
+	Position VARCHAR(60) NOT NULL)
+
+CREATE TABLE DEPARTMENT
+	(ID_Department INT IDENTITY PRIMARY KEY,
+	Department VARCHAR(60) NOT NULL)
+
+CREATE TABLE ADVERTISEMENTS
+	(ID_ADVERTISEMENTS INT IDENTITY PRIMARY KEY,
+	ClientFullName VARCHAR(60) NOT NULL,
+	ContractDate Date,
+	ID_EMPLOYEES INT,
+	EndDateContract Date,
+	ID_ActionCode INT NOT NULL)
+
+CREATE TABLE ADCOMPONENTS
+	(ID_ActionCode INT IDENTITY PRIMARY KEY,
+	ServiceType VARCHAR(60) NOT NULL,
+	ServicePrice INT,
+	EndDateService DATE)
+
+
+------
+ALTER TABLE ADVERTISEMENTS	
+	ADD CONSTRAINT datecheck
+	CHECK(ContractDate < EndDateContract)
+ALTER TABLE ADCOMPONENTS	
+	ADD CONSTRAINT pricecheck
+	CHECK(ServicePrice > 0)
+ALTER TABLE ADCOMPONENTS	
+	ADD CONSTRAINT ServiceTypeCheck
+	CHECK(ServiceType in ('RADIO', 'INTERNET','TV','POSTERS','NEWSPAPER'));
+
+--------
+
+
+ALTER TABLE EMPLOYEES
+	ADD CONSTRAINT emppos
+	FOREIGN KEY(ID_Position) REFERENCES POSITION(ID_Position)
+	ON DELETE CASCADE;
+
+ALTER TABLE EMPLOYEES
+	ADD CONSTRAINT empdep
+	FOREIGN KEY(ID_Department) REFERENCES DEPARTMENT(ID_Department)
+	ON DELETE CASCADE;
+
+ALTER TABLE ADVERTISEMENTS
+	ADD CONSTRAINT emp_ad
+	FOREIGN KEY(ID_EMPLOYEES) REFERENCES EMPLOYEES(ID_EMPLOYEES)
+	ON DELETE CASCADE;
+
+ALTER TABLE ADVERTISEMENTS
+	ADD CONSTRAINT action_ad
+	FOREIGN KEY(ID_ActionCode) REFERENCES ADCOMPONENTS(ID_ActionCode)
+	ON DELETE CASCADE;
+
+-------------
+
+
+
+
+INSERT INTO POSITION
+	VALUES('Chief Executive Officer ')
+INSERT INTO POSITION
+	VALUES('Chief Financial  Officer ')
+INSERT INTO POSITION
+	VALUES('Chief Marketing  Officer ')
+INSERT INTO POSITION
+	VALUES('Senior Manager')
+INSERT INTO POSITION
+	VALUES('Accountant')
+INSERT INTO POSITION
+	VALUES('Marketer')
+INSERT INTO POSITION
+	VALUES('Photographer ')
+INSERT INTO POSITION
+	VALUES('customer manager')
+INSERT INTO POSITION
+	VALUES('advertising manager ')
+INSERT INTO POSITION
+	VALUES('Design Manager')
+
+
+INSERT INTO ADCOMPONENTS
+	VALUES('RADIO', 5, '2019-05-05')
+INSERT INTO ADCOMPONENTS
+	VALUES('INTERNET', 100, '2019-10-05')
+INSERT INTO ADCOMPONENTS
+	VALUES('TV', 200, '2019-11-25')
+INSERT INTO ADCOMPONENTS
+	VALUES('RADIO', 150, '2019-11-05')
+INSERT INTO ADCOMPONENTS
+	VALUES('POSTERS', 750, '2019-12-15') 
+INSERT INTO ADCOMPONENTS
+	VALUES('NEWSPAPER', 690, '2019-12-11') 
+INSERT INTO ADCOMPONENTS
+	VALUES('TV', 780, '2019-11-06')
+INSERT INTO ADCOMPONENTS
+	VALUES('INTERNET', 120, '2019-10-03')
+INSERT INTO ADCOMPONENTS
+	VALUES('POSTERS', 600, '2019-12-02') 
+INSERT INTO ADCOMPONENTS
+	VALUES('RADIO', 560, '2019-12-01')
+
+
+INSERT INTO DEPARTMENT
+	VALUES('PR')
+INSERT INTO DEPARTMENT
+	VALUES('Connections')
+INSERT INTO DEPARTMENT
+	VALUES('Connect')
+INSERT INTO DEPARTMENT
+	VALUES('Partnership')
+INSERT INTO DEPARTMENT
+	VALUES('Administration')
+INSERT INTO DEPARTMENT
+	VALUES('Sponsorship')
+
+INSERT INTO EMPLOYEES
+VALUES('Jovany Kemmer', 6, 5)
+INSERT INTO EMPLOYEES
+VALUES('Nick Barton', 3, 1)
+INSERT INTO EMPLOYEES
+VALUES('Andrew Cronin', 2, 3)
+INSERT INTO EMPLOYEES
+VALUES('Odell Walker', 1, 4)
+INSERT INTO EMPLOYEES
+VALUES('Ludwig Dooley', 4, 3)
+INSERT INTO EMPLOYEES
+VALUES('Fannie Walker', 7, 5)
+INSERT INTO EMPLOYEES
+VALUES('Hailee Pagac', 9, 2)
+INSERT INTO EMPLOYEES
+VALUES('Cathryn Metz', 10, 2)
+INSERT INTO EMPLOYEES
+VALUES('Nova Padberg', 6, 3)
+INSERT INTO EMPLOYEES
+VALUES('Carlotta Sauer', 7, 1)
+INSERT INTO EMPLOYEES
+VALUES('Walton Aufderhar', 8, 5)
+INSERT INTO EMPLOYEES
+VALUES('Sheridan Schmidt', 5, 3)
+INSERT INTO EMPLOYEES
+VALUES('Wilber Lakin', 4, 2)
+INSERT INTO EMPLOYEES
+VALUES('Stanley Upton', 5, 3)
+INSERT INTO EMPLOYEES
+VALUES('Johnathon Welch', 8, 4)
+INSERT INTO EMPLOYEES
+VALUES('Selmer Romaguera', 6, 3)
+INSERT INTO EMPLOYEES
+VALUES('Isaac Nicolas', 7, 2)
+	
+INSERT INTO ADVERTISEMENTS
+VALUES(' Marcelino Heller', '2019-05-05',1,'2019-12-15', 1)
+INSERT INTO ADVERTISEMENTS
+VALUES(' Marce Hel', '2016-05-05',5,'2018-07-18', 3)
+INSERT INTO ADVERTISEMENTS
+VALUES(' Antonio Hamill', '2017-11-15',4,'2019-05-14', 7)
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Jeramie Langworth', '2017-05-10',1,'2018-09-10', 3) 
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Cristian Beer', '2017-11-09',6,'2018-08-14', 2)
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Wilfrid Spencer', '2016-09-11',7,'2019-07-18', 4)
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Jovan Barrows', '2017-08-14',10,'2019-06-19', 10)
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Timothy Davis', '2018-07-07',11,'2019-04-20', 7)
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Jacob Young', '2018-06-06',2,'2019-01-30', 8)
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Hunter Thompson', '2017-04-01',3,'2019-06-16',8)
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Owen Bennett', '2018-03-31',9,'2019-09-17', 1) 
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Ashton Brown', '2017-01-25',8,'2019-04-16', 7) 
+
+INSERT INTO ADVERTISEMENTS
+VALUES(' Julian Young', '2016-07-24',10,'2018-03-17', 9) 
+
+
+-------
+
+
+
+4lab
+
+-----
+
+1.
+
+select avg(cout) as avg_empl
+From
+( Select count(ID_ADVERTISEMENTS) as cout
+from ADVERTISEMENTS
+inner join EMPLOYEES on ADVERTISEMENTS.ID_EMPLOYEES = EMPLOYEES.ID_EMPLOYEES
+group by EMPLOYEES.FullName) as cout
+
+2.
+select * from ADCOMPONENTS 
+Where ServiceType = 'TV';
+
+
+3.
+SELECT ClientFullName, adc.ServicePrice
+from ADVERTISEMENTS ads inner join ADCOMPONENTS adc on ads.ID_ActionCode = adc.ID_ActionCode
+	where adc.ServicePrice >= (select max(adc.ServicePrice) as tt
+	from ADCOMPONENTS adc)
+
+
+
+------
+
+5lab
+
+
+
+select 
+   emp.FullName
+from
+  ADVERTISEMENTS adv
+  inner join EMPLOYEES emp 
+  on adv.ID_EMPLOYEES = emp.ID_EMPLOYEES
+group by emp.FullName
+having count(adv.ClientFullName) >= all (
+  select 
+    count(adv.ClientFullName)
+  from
+    ADVERTISEMENTS adv
+    inner join EMPLOYEES emp 
+    on adv.ID_EMPLOYEES = emp.ID_EMPLOYEES
+  group by emp.FullName
+)
+
+
+-------
+6lab
+
+1.
+create view akcii as
+select EMPLOYEES.FullName, count(ID_ADVERTISEMENTS) as Number_of_shares from ADVERTISEMENTS 
+inner join EMPLOYEES on ADVERTISEMENTS.ID_EMPLOYEES = EMPLOYEES.ID_EMPLOYEES 
+group by EMPLOYEES.FullName 
+
+select * from akcii
+
+2.
+create view TVakcii as
+select * from ADCOMPONENTS 
+Where ServiceType = 'TV';
+
+select * from TVakcii
+
+3.
+create view maxcost as 
+SELECT ClientFullName, adc.ServicePrice
+from ADVERTISEMENTS ads inner join ADCOMPONENTS adc on ads.ID_ActionCode = adc.ID_ActionCode
+	where adc.ServicePrice >= (select max(adc.ServicePrice) as tt
+	from ADCOMPONENTS adc)
+
+select * from maxcost
+
+-----
+7lab
+alter table EMPLOYEES add c_ak int
+
+create procedure procedure1 @ID_EMPLOYEES INT as  
+begin   
+declare @a int = (select count( Id_employees) from ADVERTISEMENTS where ID_EMPLOYEES = @ID_EMPLOYEES group by ID_EMPLOYEES );
+IF((@ID_EMPLOYEES > 0) and (@ID_EMPLOYEES <(Select count(ID_EMPLOYEES) from EMPLOYEES)))
+Update EMPLOYEES  
+Set c_ak = @a  
+where ID_EMPLOYEES = @ID_EMPLOYEES 
+else
+print'Error'
+end;
+
+exec procedure1 2
+-----
+8lab
+
+1.
+create trigger stop_insert on Advertisements instead of insert as   
+ declare @date1 date = (select EndDateService from ADCOMPONENTS where ID_ActionCode = (select ID_ActionCode from inserted))  
+ declare @date2 date = (select EndDateContract from inserted) 
+
+ if (@date1 > @date2)
+ begin  
+  Raiserror('Error!!!!', 16, 1) with nowait  
+  rollback transaction  
+ End
+
+ 
+INSERT INTO ADVERTISEMENTS VALUES('ff', '2016-07-24',10,'2017-03-17', 9) 
+
+
+2. 
+
+Create view ss as  
+select ID_ADVERTISEMENTS, ClientFullName, ContractDate, EndDateContract, ADCOMPONENTS.ServiceType, ADCOMPONENTS.ServicePrice from ADVERTISEMENTS  
+inner join ADCOMPONENTS on ADVERTISEMENTS.ID_ActionCode = ADCOMPONENTS.ID_ActionCode
+
+create trigger update_table  
+on ADVERTISEMENTS  
+for Update  
+as  
+IF(UPDATE(ClientFullName) or UPDATE(ContractDate) or UPDATE(EndDateContract))  
+begin  
+select * from ss  
+end  
+
+
+
+
+update ADVERTISEMENTS set ContractDate = '2017-03-07' where ID_ADVERTISEMENTS = 17
+update ADVERTISEMENTS set EndDateContract = '2018-03-07' where ID_ADVERTISEMENTS = 17
+update ADVERTISEMENTS set ClientFullName = 'Julian Joungs' where ID_ADVERTISEMENTS = 17
+-----
+9lab
+
+create login Andrey
+with password = 'Andrey',
+default_database = lab20;
+
+create login John
+with password = 'John',
+default_database = lab20;
+
+
+create user John for login John
+create user Andrey for login Andrey
+
+
+execute sp_addrolemember 'db_ddladmin', 'John';	-- права админа
+execute sp_addrolemember 'db_ddladmin', 'Andrey';
+
+grant execute on dbo.procedure1 to John -- права для процедуры для Johna
+
+
+grant select, insert on dbo.ADVERTISEMENTS to Andrey;	 -- добавление прав select и insert Andrey
+
+grant select on dbo.ADCOMPONENTS to John;
+
+
+
+USE master;         --То что существует мастер-ключ
+GO
+SELECT *
+FROM sys.symmetric_keys
+WHERE name = '##MS_ServiceMasterKey##';
+GO
+
+USE lab20; --Создаем новый мастер-ключ
+GO
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = '123';
+GO
+
+USE lab20; --Создаем новый сертификат
+GO
+CREATE CERTIFICATE Certificate_Lab9
+WITH SUBJECT = 'Protect Data';
+GO
+
+USE lab20;   -- Создание симетрического ключа 
+GO
+CREATE SYMMETRIC KEY SymmetricKey_lab9
+ WITH ALGORITHM = AES_128 
+ ENCRYPTION BY CERTIFICATE Certificate_lab9;
+GO
+
+USE lab20; -- Добавление колонки с типом varbinary
+GO
+ALTER TABLE ADVERTISEMENTS
+ADD ClientName_encrypt varbinary(MAX) NULL
+GO
+
+USE lab20;
+GO
+-- Opens the symmetric key for use
+OPEN SYMMETRIC KEY SymmetricKey_lab9
+DECRYPTION BY CERTIFICATE Certificate_lab9;
+GO
+UPDATE ADVERTISEMENTS
+SET ClientName_encrypt = EncryptByKey (Key_GUID('SymmetricKey_lab9'),ClientFullName)  --Зашифровка колонки таблицы
+FROM dbo.ADVERTISEMENTS;
+GO
+-- Closes the symmetric key
+CLOSE SYMMETRIC KEY SymmetricKey_lab9;
+GO
+
+
+
+USE lab20; --Расшифровка колонки таблицы
+GO
+OPEN SYMMETRIC KEY SymmetricKey_lab9
+DECRYPTION BY CERTIFICATE Certificate_lab9;
+GO
+-- Читання розшифрованих даних 
+SELECT 
+Id_ADVERTISEMENTS, ClientName_encrypt AS 'Encrypted Surname',
+CONVERT(varchar, DecryptByKey(ClientName_encrypt)) 
+
+FROM dbo.ADVERTISEMENTS;
+ CLOSE SYMMETRIC KEY SymmetricKey_lab9;
+GO
+
+GRANT VIEW DEFINITION ON SYMMETRIC KEY::SymmetricKey_lab9 TO Andrey; -- права доступа для Andrey
+GO
+GRANT VIEW DEFINITION ON Certificate::Certificate_lab9 TO Andrey;
+GO
+
+
+USE lab20;         --То что существует мастер-ключ
+GO
+SELECT *
+FROM sys.symmetric_keys
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,121 @@
+create table University(
+ID_University int identity primary key,
+Name_University varchar(60))
+
+create Table PTU(
+ID_PTU int identity primary key,
+Name_PTU varchar(60))
+
+create Table specialization(
+ID_specialization int identity primary key,
+Name_specialization varchar(60))
+
+create table student_card(
+ID_student_card int identity primary key,
+Name_Surname varchar(60),
+age int)
+
+create Table student(
+ID_student int identity primary key,
+ID_student_card int,
+ID_Diplom int,
+ID_student_statement int)
+
+create table Diplom(
+ID_Diplom int identity primary key,
+ID_PTU int,
+ID_specialization int)
+
+create table student_statement(
+ID_student_statement int identity primary key,
+ID_University int,
+ID_specialization int)
+
+Alter table Diplom
+add constraint key1 foreign key(ID_specialization)
+references specialization(ID_specialization)
+
+Alter table Diplom
+add constraint key2 foreign key(ID_PTU)
+references PTU(ID_PTU)
+
+Alter table student
+add constraint key3 foreign key(ID_student_card)
+references student_card(ID_student_card)
+
+Alter table student
+add constraint key4 foreign key(ID_Diplom)
+references Diplom(ID_Diplom)
+
+Alter table student
+add constraint key5 foreign key(ID_student_statement)
+references student_statement(ID_student_statement)
+
+Alter table student_statement
+add constraint key6 foreign key(ID_University)
+references University(ID_University)
+
+Alter table student_statement
+add constraint key7 foreign key(ID_specialization)
+references specialization(ID_specialization)
+
+
+Insert into University values('KPI')
+Insert into University values('KNTU')
+Insert into University values('KNEU')
+Insert into University values('KNU')
+
+Insert into PTU values('Medical school')
+Insert into PTU values('Higher vocational school')
+Insert into PTU values('Higher vocational school (culinary)')
+Insert into PTU values('metalworking and radio engineering')
+
+insert into Student_card values('Nemerovskiy Markian',17)
+insert into Student_card values('Ovczyn Germogen',18)
+insert into Student_card values('Klushin Domnin',17)
+insert into Student_card values('Mihalkov Veniamin',19)
+insert into Student_card values('Vodynskiy Makariy',18)
+insert into Student_card values('Vralov Pavel',17)
+insert into Student_card values('Shipnevskiy Irakliy',18)
+insert into Student_card values('Sheremetev Agafodor',19)
+insert into Student_card values('Adlerberg Zahar',19)
+insert into Student_card values('Chashnikov Vit',20)
+
+insert into specialization values('cook')
+insert into specialization values('programmer')
+insert into specialization values('marketer')
+insert into specialization values('locksmith')
+insert into specialization values('teacher')
+
+insert into Diplom values(1,1)
+insert into Diplom values(2,2)
+insert into Diplom values(3,3)
+insert into Diplom values(4,4)
+insert into Diplom values(4,5)
+insert into Diplom values(1,1)
+insert into Diplom values(2,2)
+insert into Diplom values(3,3)
+insert into Diplom values(4,4)
+insert into Diplom values(4,5)
+
+insert into student_statement values(1,1)
+insert into student_statement values(2,2)
+insert into student_statement values(3,3)
+insert into student_statement values(4,4)
+insert into student_statement values(1,5)
+insert into student_statement values(2,1)
+insert into student_statement values(3,2)
+insert into student_statement values(4,3)
+insert into student_statement values(1,4)
+insert into student_statement values(2,5)
+
+insert into Student values(1, 2,1)
+insert into Student values(2, 4,2)
+insert into Student values(3, 6,3)
+insert into Student values(4, 8,4)
+insert into Student values(5, 10,5)
+insert into Student values(6, 1,6)
+insert into Student values(7, 3,7)
+insert into Student values(8, 5,8)
+insert into Student values(9, 7,9)
+insert into Student values(10, 9,10)

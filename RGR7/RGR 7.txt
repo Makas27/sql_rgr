@@ -1,0 +1,142 @@
+-----Создание таблиц-----
+CREATE TABLE Склад
+	(ID_Складу INT IDENTITY PRIMARY KEY,
+	Кількість_товарів Int,
+	ID_Категорії int)
+
+CREATE TABLE Категорії
+	(ID_Категорії INT IDENTITY PRIMARY KEY,
+	Назва_Категорії VARCHAR(60) NOT NULL)
+
+CREATE TABLE Товар
+	(ID_Товару INT IDENTITY PRIMARY KEY,
+	Назва_товару VARCHAR(60),
+	Ціна float NOT NULL,
+	Одиниці_Виміру VARCHAR(60),
+	ID_Складу int)
+
+
+CREATE TABLE Місце_зберігання
+	(ID_Місця INT IDENTITY PRIMARY KEY,
+	ID_Товару int NOT NULL,
+	Номер_стелажу int,
+	Номер_лінії int,
+	Залишок varchar(60))
+
+
+CREATE TABLE Замовлення
+	(ID_Замовлення Int IDENTITY PRIMARY KEY,
+	Кількість_товару int,
+	ID_товару int,
+	Дата_замовлення date)
+
+----Связи-----
+
+ALTER TABLE Товар
+ADD CONSTRAINT key1 FOREIGN KEY(ID_Складу) 
+REFERENCES Склад(ID_Складу)
+ON DELETE CASCADE;
+
+ALTER TABLE Місце_зберігання
+ADD CONSTRAINT key2 FOREIGN KEY(ID_Товару) 
+REFERENCES Товар(ID_Товару)
+ON DELETE CASCADE;
+
+ALTER TABLE Замовлення
+ADD CONSTRAINT key3 FOREIGN KEY(ID_Товару) 
+REFERENCES Товар(ID_Товару)
+ON DELETE CASCADE;
+
+ALTER TABLE Склад
+ADD CONSTRAINT key4 FOREIGN KEY(ID_Категорії) 
+REFERENCES Категорії(ID_Категорії)
+ON DELETE CASCADE;
+
+----Ограничения---
+
+ALTER TABLE Товар
+ADD CONSTRAINT Одиниці_чек
+	CHECK (Одиниці_виміру IN ('шт', 'л', 'кг'));
+
+ALTER TABLE Замовлення
+ADD CONSTRAINT Замовлення_чек
+	CHECK (Дата_замовлення < getdate());
+
+---Заполнение----
+
+INSERT INTO Категорії VALUES('Спортивні товари');
+INSERT INTO Категорії VALUES('Напої');
+INSERT INTO Категорії VALUES('Будівельні матеріали');
+INSERT INTO Категорії VALUES('Одяг');
+INSERT INTO Категорії VALUES('Техніка');
+
+INSERT INTO Склад VALUES(200, 1);
+INSERT INTO Склад VALUES(50, 2);
+INSERT INTO Склад VALUES(500, 3);
+INSERT INTO Склад VALUES(100, 4);
+INSERT INTO Склад VALUES(800, 5);
+
+INSERT INTO Товар VALUES('Викрутка',100000 , 'шт', 5);
+INSERT INTO Товар VALUES('Перфоратор', 5000, 'шт', 5);
+INSERT INTO Товар VALUES('Дрель', 4000, 'шт', 5);
+INSERT INTO Товар VALUES('Штани', 40, 'шт', 4);
+INSERT INTO Товар VALUES('Курточка', 8000, 'шт', 4);
+INSERT INTO Товар VALUES('Футболка', 1000, 'шт', 4);
+INSERT INTO Товар VALUES('Пісок', 500, 'кг', 3);
+INSERT INTO Товар VALUES('Гравій', 200, 'кг', 3);
+INSERT INTO Товар VALUES('Цемент', 300, 'кг', 3);
+INSERT INTO Товар VALUES('Віскі', 500, 'л', 2);
+INSERT INTO Товар VALUES('Кола', 20, 'л', 2);
+INSERT INTO Товар VALUES('Сік', 30, 'л', 2);
+INSERT INTO Товар VALUES('Мяч', 400, 'шт', 1);
+INSERT INTO Товар VALUES('Ворота', 10000, 'шт', 1);
+INSERT INTO Товар VALUES('Бігова доріжка', 8000, 'шт', 1);
+
+INSERT INTO Замовлення VALUES(50, 1, '2019-05-05');
+INSERT INTO Замовлення VALUES(10, 2, '2019-05-24');
+INSERT INTO Замовлення VALUES(3, 3, '2019-05-25');
+INSERT INTO Замовлення VALUES(1, 10, '2019-06-06');
+INSERT INTO Замовлення VALUES(7, 11, '2019-06-08');
+INSERT INTO Замовлення VALUES(1, 14, '2019-06-13');
+INSERT INTO Замовлення VALUES(20, 4, '2019-06-14');
+INSERT INTO Замовлення VALUES(5, 5, '2019-06-15');
+INSERT INTO Замовлення VALUES(20, 7, '2019-06-17');
+INSERT INTO Замовлення VALUES(15, 9, '2019-06-20');
+INSERT INTO Замовлення VALUES(20, 6, '2019-07-04');
+INSERT INTO Замовлення VALUES(10, 8, '2019-07-07');
+INSERT INTO Замовлення VALUES(3, 12, '2019-07-13');
+INSERT INTO Замовлення VALUES(100, 13, '2019-07-17');
+INSERT INTO Замовлення VALUES(2, 15, '2019-07-18');
+INSERT INTO Замовлення VALUES(10, 1, '2019-07-20');
+INSERT INTO Замовлення VALUES(10, 12, '2019-08-07');
+INSERT INTO Замовлення VALUES(10, 8, '2019-08-14');
+INSERT INTO Замовлення VALUES(11, 7, '2019-09-10');
+INSERT INTO Замовлення VALUES(3, 11, '2019-09-19');
+INSERT INTO Замовлення VALUES(3, 5, '2019-09-20');
+INSERT INTO Замовлення VALUES(88, 3, '2019-10-02');
+INSERT INTO Замовлення VALUES(66, 2, '2019-11-06');
+INSERT INTO Замовлення VALUES(15, 1, '2019-11-10');
+INSERT INTO Замовлення VALUES(10, 6, '2019-11-11');
+INSERT INTO Замовлення VALUES(8, 8, '2019-11-16');
+
+INSERT INTO Місце_зберігання VALUES(1, 1, 1,NULL);
+INSERT INTO Місце_зберігання VALUES(2, 2, 1,NULL);
+INSERT INTO Місце_зберігання VALUES(3, 3, 1,NULL);
+INSERT INTO Місце_зберігання VALUES(4, 1, 2,NULL);
+INSERT INTO Місце_зберігання VALUES(5, 2, 2,NULL);
+INSERT INTO Місце_зберігання VALUES(6, 3, 2,NULL);
+INSERT INTO Місце_зберігання VALUES(7, 1, 3,NULL);
+INSERT INTO Місце_зберігання VALUES(8, 2, 3,NULL);
+INSERT INTO Місце_зберігання VALUES(9, 3, 3,NULL);
+INSERT INTO Місце_зберігання VALUES(10, 1, 4,NULL);
+INSERT INTO Місце_зберігання VALUES(11, 2, 4,NULL);
+INSERT INTO Місце_зберігання VALUES(12, 3, 4,NULL);
+INSERT INTO Місце_зберігання VALUES(13, 1, 5,NULL);
+INSERT INTO Місце_зберігання VALUES(14, 2, 5,NULL);
+INSERT INTO Місце_зберігання VALUES(15, 3, 5,NULL);
+
+
+
+
+
+

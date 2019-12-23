@@ -1,0 +1,93 @@
+-----Создание таблиц----
+CREATE TABLE shop_assistant
+	(ID_shop_assistant INT IDENTITY PRIMARY KEY,
+	FullName VARCHAR(60),
+	number_of_sales Int)
+
+CREATE TABLE kind
+	(Id_kind INT IDENTITY PRIMARY KEY,
+	Name_Kind VARCHAR(60) NOT NULL)
+
+CREATE TABLE product
+	(ID_product INT IDENTITY PRIMARY KEY,
+	Name_product VARCHAR(60),
+	description_product VARCHAR(60),
+	mark VARCHAR(60),
+	Id_kind INT,
+	amount_product int,
+	Price_in_euro int,
+	Price_in_grn int)
+
+
+CREATE TABLE selling
+	(ID_selling INT IDENTITY PRIMARY KEY,
+	ID_shop_assistant int NOT NULL,
+	ID_product int,
+	Qantity_selling int,
+	Date_sale date)
+
+
+
+
+----Связи и ограничения-----
+
+ALTER TABLE product
+ADD CONSTRAINT key1 FOREIGN KEY(Id_kind) 
+REFERENCES kind(Id_kind)
+ON DELETE CASCADE;
+
+ALTER TABLE selling
+ADD CONSTRAINT key2 FOREIGN KEY(ID_product) 
+REFERENCES product(ID_product)
+ON DELETE CASCADE;
+
+
+ALTER TABLE selling
+ADD CONSTRAINT key3 FOREIGN KEY(ID_shop_assistant) 
+REFERENCES shop_assistant(ID_shop_assistant)
+ON DELETE CASCADE;
+
+ALTER TABLE selling
+ADD CONSTRAINT sale_of_goods_check
+	CHECK (Date_sale < getdate());
+
+
+INSERT INTO kind VALUES('screen');
+INSERT INTO kind VALUES('Laptop');
+INSERT INTO kind VALUES('headphones');
+INSERT INTO kind VALUES('keyboard');
+INSERT INTO kind VALUES('Printer');
+
+INSERT INTO product VALUES('Porsche Design', 'I3582C54H5NIL-BK' ,'Lenovo' ,2, 10, 900, 0);
+INSERT INTO product VALUES('BLADE', '7DT87EA', 'HP', 2, 5, 400, 0);
+INSERT INTO product VALUES('PS42 Modern', '90NR01L3-M02530','Asus',1, 10, 700,0);
+INSERT INTO product VALUES('GF63 9RCX', 'GF639RCX-852XUA','Apple',1, 3, 1000, 0);
+INSERT INTO product VALUES('Inspiron 3582', 'I3582C54H5NIW-BK','Dell', 3, 100, 1100, 0);
+INSERT INTO product VALUES('Vist', 'N2066VN3580EMEA01_2001', 'Lenovo',3, 55, 200, 0);
+INSERT INTO product VALUES('Vostro 3580', 'A10M-653XUA','HP',4, 44, 200, 0);
+INSERT INTO product VALUES('Vumkuif', '81DC010ARA','Asus',4, 30, 250, 0);
+INSERT INTO product VALUES('JJartem', 'NX.HEDEU.022','Apple', 5, 21, 160, 0);
+INSERT INTO product VALUES('prostobok', '81DC010ARA','Dell', 5, 50, 1800, 0);
+
+INSERT INTO shop_assistant VALUES('Sumarokov Marlen',0);
+INSERT INTO shop_assistant VALUES('Vasilenko Anisiy',0);
+INSERT INTO shop_assistant VALUES('Prokudin Dosifey',0);
+INSERT INTO shop_assistant VALUES('Lange Feoktist',0);
+INSERT INTO shop_assistant VALUES('Kazin Aetiy',0);
+
+INSERT INTO selling  VALUES(1, 1, 3, '2019-08-28');
+INSERT INTO selling  VALUES(2, 3, 2, '2019-09-03');
+INSERT INTO selling  VALUES(1, 10, 7, '2019-09-16');
+INSERT INTO selling  VALUES(1, 9, 8, '2019-09-17');
+INSERT INTO selling  VALUES(2, 9, 10,'2019-10-02');
+INSERT INTO selling  VALUES(5, 8, 5,'2019-10-08');
+INSERT INTO selling  VALUES(2, 7, 4,'2019-10-09');
+INSERT INTO selling  VALUES(4, 5, 3,'2019-10-16');
+INSERT INTO selling  VALUES(3, 3, 5,'2019-10-23');
+INSERT INTO selling  VALUES(1, 4, 3,'2019-10-28');
+INSERT INTO selling  VALUES(3, 6, 5,'2019-11-04');
+INSERT INTO selling  VALUES(5, 1, 3,'2019-11-22');
+INSERT INTO selling  VALUES(4, 5, 1,'2019-12-02');
+INSERT INTO selling  VALUES(5, 6, 2,'2019-12-03');
+INSERT INTO selling  VALUES(5, 6, 3,'2018-12-09');
+INSERT INTO selling  VALUES(2, 7, 4,'2018-12-12');

@@ -1,0 +1,129 @@
+15 Variant RGR
+
+1.1 
+
+CREATE VIEW Author_and_Reader as SELECT Name_surname, Name_and_Surname FROM Author 
+INNER JOIN Books ON Author.ID_Author = Books.ID_Author
+INNER JOIN Notice ON Notice.ID_Books = Books.ID_Books
+INNER JOIN Reader ON Reader.ID_Reader = Notice.ID_Reader
+
+SELECT * FROM Author_and_Reader
+
+DROP VIEW Author_and_Reader
+
+1.2
+
+SELECT Book_title FROM Books WHERE ID_Author = 3
+
+1.3
+
+SELECT Name_and_surname FROM Reader
+INNER JOIN Notice ON Notice.ID_Reader = Reader.ID_Reader 
+WHERE (SELECT DATEDIFF(day, Date_To_take, GETDATE())) > 30
+
+2.1 
+
+CREATE PROCEDURE Amount as
+BEGIN
+	SELECT COUNT(Name_and_surname) FROM Reader
+	INNER JOIN Notice ON Notice.ID_Reader = Reader.ID_Reader 
+	WHERE (SELECT DATEDIFF(day, Date_To_take, GETDATE())) > 30
+END
+
+exec Amount
+
+DROP PROCEDURE Amount
+
+2.2
+
+CREATE PROCEDURE Books_amount @month int as
+BEGIN
+	SELECT COUNT(ID_Books) FROM Notice where DATEPART(month, Date_To_take) = @month;
+END
+
+exec Books_amount 1
+
+DROP PROCEDURE Books_amount
+
+3.1 
+
+CREATE PROCEDURE Delete_notice as
+BEGIN
+	DELETE FROM Notice WHERE(SELECT DATEDIFF(YEAR, Date_To_take, GETDATE())) = 1
+END
+
+exec Delete_notice 
+
+DROP PROCEDURE Delete_notice
+
+3.2
+
+CREATE PROCEDURE New_addr @Id_Reader INT, @New_addr VARCHAR(60) as
+BEGIN
+	UPDATE Reader set Adress = @New_addr WHERE Reader.ID_Reader = @Id_Reader
+END
+
+exec New_addr 1, '228 USA'
+
+DROP PROCEDURE New_addr
+
+4.1 
+ 
+CREATE PROCEDURE Reader_info @Name_and_surname VARCHAR(60) as
+BEGIN
+	SELECT Name_and_Surname, [Work], Adress, ID_Notice, Date_To_take, Book_title FROM Reader 
+	INNER JOIN Notice ON Reader.ID_Reader = Notice.ID_Reader
+	INNER JOIN Books ON Notice.ID_Books = Books.ID_Books
+	WHERE Reader.Name_and_Surname = @Name_and_surname
+END
+
+exec Reader_info 'Kirponos Oleg'
+
+DROP PROCEDURE Reader_info
+
+4.2 
+
+CREATE VIEW Authors_books AS SELECT name_surname, ID_Books, Book_title FROM Author 
+INNER JOIN Books ON Author.ID_Author = Books.ID_Author
+
+DROP VIEW Authors_books
+
+CREATE PROCEDURE Book_exists @Author VARCHAR(60), @TITLE VARCHAR(60) as
+BEGIN
+	declare @Id_Book INT
+
+	SET @Id_Book = (SELECT Id_Books FROM Authors_books
+		WHERE (Authors_books.Name_Surname = @Author AND Authors_books.Book_title = @TITLE))
+
+	IF EXISTS (SELECT * FROM Books WHERE (Books.ID_Books = @Id_Book))
+		begin
+			SELECT 'TRUE'
+		end
+	else
+		begin
+			SELECT 'FALSE'
+		end
+END
+
+exec Book_exists 'Flannery OConnor' ,'The Complete Stories'
+
+DROP PROCEDURE Book_exists
+
+4.3
+
+SELECT Name_and_surname, Adress, [Work] FROM Reader
+inner join Notice on Reader.ID_Reader = Notice.ID_Reader
+WHERE (SELECT DATEDIFF(day, Date_To_take, GETDATE())) > 30 
+order by [Work]
+
+4.4 
+
+CREATE VIEW debtor AS SELECT Name_and_surname, Adress FROM Reader
+inner join Notice on Reader.ID_Reader = Notice.ID_Reader
+WHERE (SELECT DATEDIFF(day, Date_To_take, GETDATE())) > 30 
+
+SELECT * FROM debtor
+
+DROP VIEW debtor
+
+

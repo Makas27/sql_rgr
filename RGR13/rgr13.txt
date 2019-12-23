@@ -1,0 +1,108 @@
+-----Создание таблиц----
+CREATE TABLE Seller
+	(ID_Seller INT IDENTITY PRIMARY KEY,
+	sales_amount Int,
+	Name_Surname VARCHAR(60))
+
+CREATE TABLE Typ_product
+	(Id_Typ_product INT IDENTITY PRIMARY KEY,
+	Name_Typ_product VARCHAR(60) NOT NULL)
+
+CREATE TABLE product
+	(ID_product INT IDENTITY PRIMARY KEY,
+	Name_product VARCHAR(60),
+	Id_Typ_product INT,
+	description_product VARCHAR(60),
+	Price_euro int,
+	Qantity_product int,
+	mark VARCHAR(60),
+	Price_grn int)
+
+
+CREATE TABLE sale_of_goods
+	(ID_sale_of_goods INT IDENTITY PRIMARY KEY,
+	ID_Seller int NOT NULL,
+	ID_product int,
+	Qantity_Sales int,
+	Date_of_sale date)
+
+
+
+
+----Связи и ограничения-----
+
+ALTER TABLE product
+ADD CONSTRAINT key1 FOREIGN KEY(ID_Typ_product) 
+REFERENCES Typ_product(ID_Typ_product)
+ON DELETE CASCADE;
+
+ALTER TABLE sale_of_goods
+ADD CONSTRAINT key2 FOREIGN KEY(ID_product) 
+REFERENCES product(ID_product)
+ON DELETE CASCADE;
+
+
+ALTER TABLE sale_of_goods
+ADD CONSTRAINT key3 FOREIGN KEY(ID_Seller) 
+REFERENCES Seller(ID_Seller)
+ON DELETE CASCADE;
+
+ALTER TABLE sale_of_goods
+ADD CONSTRAINT sale_of_goods_check
+	CHECK (Date_of_sale < getdate());
+
+------Заполнение-----
+
+INSERT INTO Typ_product VALUES('screen');
+INSERT INTO Typ_product VALUES('Laptop');
+INSERT INTO Typ_product VALUES('The tablet');
+INSERT INTO Typ_product VALUES('Power Supply');
+INSERT INTO Typ_product VALUES('periphery');
+
+INSERT INTO product VALUES('LapBook Pro', 2, 'New: A brand-new, unused, unopened, undamaged item', 1000, 10, 'CHUWI', 0);
+INSERT INTO product VALUES('Envy13', 2, 'This is Microsoft Certified Refurbished product', 300, 5, 'HP', 0);
+INSERT INTO product VALUES('JJcool 2017', 1, 'International Priority Shipping', 600, 10, 'Asus', 0);
+INSERT INTO product VALUES('Probook 888', 1, 'has been professionally restored to working', 4000, 3, 'Apple', 0);
+INSERT INTO product VALUES('Kutrum Pro', 3, 'Sprocket Pocket Digital Photo Printer in White', 1200, 100, 'Dell', 0);
+INSERT INTO product VALUES('Visti pro756', 3, 'Includes international tracking', 300, 55, 'CHUWI', 0);
+INSERT INTO product VALUES('Kurt 009', 4, 'All-in-One Printer delivering crisp and detailed images', 200, 44, 'HP', 0);
+INSERT INTO product VALUES('567j ', 4, 'Trusted seller, fast shipping, and easy returns', 150, 30, 'Asus', 0);
+INSERT INTO product VALUES('List v24', 5, 'Get the item you ordered or get your', 140, 21, 'Apple', 0);
+INSERT INTO product VALUES('karton pro+', 5, 'Fantastic Lenovo X1 Carbon 2nd generation non-touch ', 100, 50, 'Dell', 0);
+
+
+INSERT INTO Seller VALUES(0, 'Spechinskiy Eleazar');
+INSERT INTO Seller VALUES(0, 'Arnautov Vasiliy');
+INSERT INTO Seller VALUES(0, 'Knyazev Tarasiy');
+INSERT INTO Seller VALUES(0, 'Shhurov Afanasiy');
+INSERT INTO Seller VALUES(0, 'Voloczkiy Tarasiy');
+
+INSERT INTO sale_of_goods VALUES(1, 1, 3,'2019-01-15');
+INSERT INTO sale_of_goods  VALUES(2, 3, 2,'2019-01-22');
+INSERT INTO sale_of_goods VALUES(1, 10, 7,'2019-02-08');
+INSERT INTO sale_of_goods  VALUES(1, 9, 8,'2019-02-13');
+INSERT INTO sale_of_goods  VALUES(2, 9, 10,'2019-02-20');
+INSERT INTO sale_of_goods  VALUES(5, 8, 5,'2019-02-21');
+INSERT INTO sale_of_goods  VALUES(2, 7, 4,'2019-04-01');
+INSERT INTO sale_of_goods  VALUES(4, 5, 3,'2019-04-09');
+INSERT INTO sale_of_goods  VALUES(3, 3, 5,'2019-04-23');
+INSERT INTO sale_of_goods  VALUES(1, 4, 3,'2019-05-07');
+INSERT INTO sale_of_goods VALUES(3, 6, 5,'2019-05-31');
+INSERT INTO sale_of_goods  VALUES(5, 1, 3,'2019-08-16');
+INSERT INTO sale_of_goods  VALUES(4, 5, 1,'2019-10-18');
+INSERT INTO sale_of_goods  VALUES(5, 6, 2,'2019-11-08');
+INSERT INTO sale_of_goods  VALUES(5, 6, 3,'2018-11-02');
+INSERT INTO sale_of_goods  VALUES(2, 7, 4,'2018-10-12');
+
+
+
+
+
+
+
+
+
+
+
+
+

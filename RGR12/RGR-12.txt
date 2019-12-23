@@ -1,0 +1,210 @@
+CREATE TABLE Supplies
+	(ID_Supplies INT IDENTITY PRIMARY KEY,
+	ID_product int,
+	ID_provider int,
+	ID_shop int,
+	date_Supplies date)
+
+CREATE TABLE shop
+	(ID_shop INT IDENTITY PRIMARY KEY,
+	Name_shop varchar(60),
+	Adress_shop varchar(60))
+
+CREATE TABLE providers
+	(ID_provider INT IDENTITY PRIMARY KEY,
+	Name_provider VARCHAR(60) NOT NULL,
+	Adress_provider varchar(60),
+	Telefon_number int)
+
+CREATE TABLE product
+	(ID_product INT IDENTITY PRIMARY KEY,
+	ID_category int,
+	Name_product varchar(60),
+	ID_firm int,
+	price int,
+	expiration_date int)
+
+
+CREATE TABLE firm
+	(ID_firm INT IDENTITY PRIMARY KEY,
+	Name_firm varchar(60))
+
+CREATE TABLE category
+	(ID_category INT IDENTITY PRIMARY KEY,
+	Name_category varchar(60))
+
+
+
+ALTER TABLE Supplies
+ADD CONSTRAINT key1 FOREIGN KEY(ID_shop) 
+REFERENCES shop(ID_shop)
+ON DELETE CASCADE;
+
+ALTER TABLE Supplies
+ADD CONSTRAINT key2 FOREIGN KEY(ID_provider) 
+REFERENCES providers(ID_provider)
+ON DELETE CASCADE;
+
+ALTER TABLE Supplies
+ADD CONSTRAINT key3 FOREIGN KEY(ID_product) 
+REFERENCES product(ID_product)
+ON DELETE CASCADE;
+
+ALTER TABLE product
+ADD CONSTRAINT key4 FOREIGN KEY(ID_firm) 
+REFERENCES firm(ID_firm)
+ON DELETE CASCADE;
+
+ALTER TABLE product
+ADD CONSTRAINT key5 FOREIGN KEY(ID_category) 
+REFERENCES category(ID_category)
+ON DELETE CASCADE;
+
+
+Insert into firm values('Samsung')
+Insert into firm values('Apple')
+Insert into firm values('Sony')
+Insert into firm values('Huawei')
+Insert into firm values('Xiaomi')
+
+Insert into category values('Phone')
+Insert into category values('Headphones')
+Insert into category values('video recorder')
+Insert into category values('audio recorder')
+Insert into category values('TV')
+
+Insert into shop values('Foxstrot', '841  Cityview Drive')
+Insert into shop values('Moyo', '1105 Simpson Street')
+Insert into shop values('TTT', '4443  Old House Drive')
+Insert into shop values('Rozetka', '1570  Coleman Avenue')
+Insert into shop values('Allo', '1519  Deercove Drive')
+
+Insert into providers values('BBCgroup', '4825  Bloomfield Way',0916571432)
+Insert into providers values('SuperGroup', '3872  Oral Lake Road',0917362451)
+Insert into providers values('JJgroupT', '968  Sycamore Street',0912346175)
+Insert into providers values('TOurBv', '1882  Cherry Tree Drive',0915326417)
+Insert into providers values('KOlYaHop', '3703  Flint Street',0916743125)
+
+
+Insert into product values(1, 'ROG Strix', 3, 2000,1)
+Insert into product values(1, 'Modern 14', 4, 1000,1)
+Insert into product values(2, 'Inspiron 3581', 1, 500,5)
+Insert into product values(2, 'Nitro 5', 2, 800,1)
+Insert into product values(3, 'Inspiron G5', 5, 700,5)
+Insert into product values(3, 'Empire Leather', 5, 200,1)
+Insert into product values(4, '2E', 3, 400,2)
+Insert into product values(4, 'Grand-X', 1, 150,1)
+Insert into product values(5, 'FitLogic', 4, 300,2)
+Insert into product values(5, 'ZenBook', 2, 800,2)
+
+
+Insert into Supplies values(1, 1, 1,'2019-09-18')
+Insert into Supplies values(2, 1, 2,'2019-09-24')
+Insert into Supplies values(3, 2, 3,'2019-10-09')
+Insert into Supplies values(4, 2, 4,'2019-10-10')
+Insert into Supplies values(5, 3, 5,'2019-10-14')
+Insert into Supplies values(6, 3, 2,'2019-10-30')
+Insert into Supplies values(7, 4, 1,'2019-11-05')
+Insert into Supplies values(8, 4, 5,'2019-11-13')
+Insert into Supplies values(9, 5, 3,'2019-11-14')
+Insert into Supplies values(10, 5, 4,'2019-11-15')
+Insert into Supplies values(10, 5, 5,'2019-11-18')
+Insert into Supplies values(5, 3, 4,'2019-11-21')
+Insert into Supplies values(6, 3, 3,'2019-11-26')
+Insert into Supplies values(7, 4, 2,'2019-11-28')
+Insert into Supplies values(8, 4, 1,'2019-12-04')
+
+
+
+-- View --
+
+CREATE VIEW GeneralSuppls as SELECT 
+date_Supplies as SupplsDate, Name_product as ProductName,
+price as Price, expiration_date as ExpDate, Name_category as Category,
+Name_firm as Firm, Name_shop as Shop, Adress_shop as AdressShop, 
+Name_provider as Providers, Adress_provider as Adress_prov,
+Telefon_number as Telefon FROM Supplies
+inner join product on product.ID_product = Supplies.ID_product
+inner join category on category.ID_category = product.ID_category
+inner join firm on firm.ID_firm = product.ID_firm
+inner join shop on shop.ID_shop = Supplies.ID_shop
+inner join providers on providers.ID_provider = Supplies.ID_provider
+
+1.1
+
+SELECT distinct ProductName, Firm, Providers, Price FROM GeneralSuppls
+
+1.2.1
+
+SELECT distinct ProductName, Firm, Providers, Price, Category FROM GeneralSuppls
+WHERE Category = 'video recorder' AND Price BETWEEN 200 AND 700
+
+1.2.2
+
+
+SELECT distinct ProductName, Firm, Providers, Price, Category FROM GeneralSuppls
+WHERE Category = 'TV' AND Firm = 'Apple'
+
+1.3
+
+SELECT Firm, ProductName FROM GeneralSuppls WHERE Firm = 'Samsung' 
+
+2.1
+
+CREATE PROCEDURE AmountOfType @NAME VARCHAR (60) AS
+BEGIN
+	SELECT COUNT(distinct category) FROM GeneralSuppls
+	WHERE Firm = @NAME
+END
+
+exec AmountOfType 'Sony'
+
+2.2
+
+CREATE PROCEDURE PriceForTv @NAME VARCHAR (60) AS
+BEGIN
+	SELECT AVG(Price) FROM GeneralSuppls
+	WHERE Firm = @NAME AND Category = 'TV'
+END
+
+exec PriceForTv 'Apple'
+
+3.1
+
+CREATE PROCEDURE DELETING @Name VARCHAR(60) AS
+BEGIN	
+	DELETE Supplies WHERE ID_provider =  
+	(SELECT distinct providers.ID_provider FROM providers inner join Supplies on Supplies.ID_provider = providers.ID_provider
+	WHERE providers.Name_provider = 'BBCgroup')
+END
+
+exec DELETING 'BBCgroup'
+
+3.2 
+
+-- @Direction = 1: ціна зростая, @Direction = 0: падає
+
+CREATE PROCEDURE ChangePercent @Percent INT, @Name VARCHAR(60), @Direction TINYINT AS 
+BEGIN 
+	if (@Direction = 1) 
+	begin
+		UPDATE GeneralSuppls SET Price = Price + Price * @Percent / 100 
+		WHERE Providers = @Name
+	end
+	else 
+	begin 
+		UPDATE GeneralSuppls SET Price = Price * @Percent / 100 
+		WHERE Providers = @Name
+	end
+END
+
+exec ChangePercent 50, 'SuperGroup', 0
+
+4.1
+
+SELECT ProductName, Price, Firm, Providers, Adress_prov, Telefon FROM GeneralSuppls
+WHERE Category = 'TV' order by Firm
+
+4.2
+
+SELECT ProductName, Price, Firm, ExpDate, Shop FROM GeneralSuppls

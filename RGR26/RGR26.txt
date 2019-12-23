@@ -1,0 +1,139 @@
+----создание таблиц----
+
+CREATE TABLE driver_license
+	(ID_driver_license INT IDENTITY PRIMARY KEY,
+	Category varchar(10))
+
+CREATE TABLE Owner_car
+	(ID_Owner_car INT IDENTITY PRIMARY KEY,
+	ID_driver_license INT,
+	Name_Surname varchar(60),
+	DateOfBirthday date)
+
+CREATE TABLE Car
+	(ID_Car INT IDENTITY PRIMARY KEY,
+	ID_Owner_car INT,
+	Car_numbers varchar(10),
+	Car_Model varchar(60),
+	Car_Color varchar(60),
+	Car_Typ varchar(60),
+	Id_Notice int,
+	ID_GAI int)
+
+CREATE TABLE GAI
+	(ID_GAI INT IDENTITY PRIMARY KEY,
+	Adress varchar(60),
+	Sum_debt int)
+
+
+CREATE TABLE Notice
+	(ID_Notice INT IDENTITY PRIMARY KEY,
+	engine_number INT,
+	Date_of_inspection date,
+	Next_Date_of_inspection date,
+	Payment_date date,
+	Next_Payment_date date,
+	Payment tinyint,
+	Inspection tinyint,
+	Sum_debt_Notice int)
+
+-----связи и проверки----
+
+ALTER TABLE Car
+ADD CONSTRAINT key1 FOREIGN KEY(ID_GAI) 
+REFERENCES Gai(ID_GAI)
+ON DELETE CASCADE;
+
+ALTER TABLE Owner_Car
+ADD CONSTRAINT key2 FOREIGN KEY(ID_driver_license) 
+REFERENCES driver_license(ID_driver_license)
+ON DELETE CASCADE;
+
+ALTER TABLE Car
+ADD CONSTRAINT key3 FOREIGN KEY(ID_Owner_car) 
+REFERENCES Owner_car(ID_Owner_car)
+ON DELETE CASCADE;
+
+ALTER TABLE Car
+ADD CONSTRAINT key4 FOREIGN KEY(ID_Notice) 
+REFERENCES Notice(ID_Notice)
+ON DELETE CASCADE;
+
+
+ALTER TABLE driver_license
+ADD CONSTRAINT licenseCheck
+	CHECK (Category IN ('A', 'B', 'C', 'D', 'E'));
+
+ALTER TABLE Owner_car
+ADD CONSTRAINT OwnerCheck
+	CHECK (DateOfBirthday < getdate());
+
+
+-----Заполнение таблиц----
+
+INSERT INTO GAI VALUES('2500 Ridge Road', NULL);
+
+INSERT INTO driver_license VALUES('A');
+INSERT INTO driver_license VALUES('B');
+INSERT INTO driver_license VALUES('C');
+INSERT INTO driver_license VALUES('D');
+INSERT INTO driver_license VALUES('E');
+
+
+INSERT INTO Notice VALUES(45678460,'2018-01-24', '2019-01-24', '2019-03-20', '2020-03-20', Null, Null, 5000);
+INSERT INTO Notice VALUES(78493475,'2018-02-09', '2020-02-09', '2019-01-23', '2020-01-23', Null, Null, 1000);
+INSERT INTO Notice VALUES(34580546,'2018-03-26', '2020-03-26', '2019-01-30', '2020-01-30', Null, Null, 500);
+INSERT INTO Notice VALUES(15068427,'2018-08-02', '2020-08-02', '2019-02-27', '2020-02-27', Null, Null, 600);
+INSERT INTO Notice VALUES(56703954,'2018-08-28', '2020-08-28', '2019-03-20', '2020-03-20', Null, Null, 300);
+INSERT INTO Notice VALUES(56371957,'2018-09-07', '2020-09-07', '2019-03-21', '2020-03-21', Null, Null, 0);
+INSERT INTO Notice VALUES(56735643,'2018-10-03', '2020-10-03', '2019-04-22', '2020-04-22', Null, Null, 500);
+INSERT INTO Notice VALUES(67320865,'2018-10-08', '2020-10-08', '2019-05-21', '2020-05-21', Null, Null, 200);
+INSERT INTO Notice VALUES(75349526,'2018-12-18', '2020-12-18', '2019-07-08', '2020-07-08', Null, Null, 100);
+INSERT INTO Notice VALUES(89650541,'2019-02-14', '2021-02-14', '2019-07-10', '2020-07-10', Null, Null, 1000);
+INSERT INTO Notice VALUES(96574965,'2019-04-08', '2021-04-08', '2019-07-17', '2020-07-17', Null, Null, 700);
+INSERT INTO Notice VALUES(76935746,'2019-04-24', '2021-04-24', '2019-08-06', '2020-08-06', Null, Null, 800);
+INSERT INTO Notice VALUES(69275026,'2019-05-30', '2021-05-30', '2019-08-23', '2020-08-23', Null, Null, 0);
+INSERT INTO Notice VALUES(67954025,'2019-10-16', '2021-10-16', '2019-10-03', '2020-10-03', Null, Null, 0);
+INSERT INTO Notice VALUES(76930335,'2019-10-31', '2021-10-31', '2019-11-21', '2020-11-21', Null, Null, 0);
+
+
+
+INSERT INTO Owner_car VALUES(1,'Muhanov Zahar', '1977-04-14');
+INSERT INTO Owner_car VALUES(2,'Evrigin Anisiy', '1981-06-09');
+INSERT INTO Owner_car VALUES(5,'Brehov Selivan', '1982-08-11');
+INSERT INTO Owner_car VALUES(2,'Mansurov Apelliy', '1984-04-02');
+INSERT INTO Owner_car VALUES(1,'Asseev Ioann', '1986-02-21');
+INSERT INTO Owner_car VALUES(4,'Matkevich Boguslav', '1987-01-15');
+INSERT INTO Owner_car VALUES(3,'Bagreev Abram', '1987-03-10');
+INSERT INTO Owner_car VALUES(3,'Stremouhov Semyon', '1987-04-22');
+INSERT INTO Owner_car VALUES(2,'Yukovskiy Savva', '1988-02-18');
+INSERT INTO Owner_car VALUES(5,'Gardenin Agniy', '1988-04-12');
+INSERT INTO Owner_car VALUES(3,'Karacharov Nastasiy', '1991-12-24');
+INSERT INTO Owner_car VALUES(2,'Rozvadovskiy Yaropolk', '1996-06-10');
+INSERT INTO Owner_car VALUES(5,'Dubrovin Avsey', '1997-07-31');
+INSERT INTO Owner_car VALUES(4,'Gradovskiy Porfiriy', '1998-02-05');
+INSERT INTO Owner_car VALUES(4,'Belenkov Yakov', '1998-12-02');
+
+
+INSERT INTO Car VALUES(13, 'AA1111BB', 'Renault', 'blue', 'sedan', 4, 1);
+INSERT INTO Car VALUES(1, 'AA7853BO', 'Peugeout', 'blue', 'minivan', 3, 1);
+INSERT INTO Car VALUES(2, 'AA6734DO', 'Porshe', 'yellow', 'minivan', 11, 1);
+INSERT INTO Car VALUES(4, 'AA0089KO', 'BMW', 'gray', 'universal', 14, 1);
+INSERT INTO Car VALUES(5, 'AA7589BO', 'Mercedes', 'black', 'pikap', 1, 1);
+INSERT INTO Car VALUES(7, 'AA4674NN', 'Lanos', 'red', 'kupe', 2, 1);
+INSERT INTO Car VALUES(3, 'AA7684DD', 'Mercedes', 'red', 'sedan', 5, 1);
+INSERT INTO Car VALUES(11, 'AA7569BO', 'BMW', 'black', 'universal', 6, 1);
+INSERT INTO Car VALUES(15, 'AA3721SS', 'RR', 'blue', 'pikap', 15, 1);
+INSERT INTO Car VALUES(6, 'AA8605QW', 'Aston Martin', 'black', 'universal', 13, 1);
+INSERT INTO Car VALUES(8, 'AA7843FF', 'Renault', 'red', 'sedan', 7, 1);
+INSERT INTO Car VALUES(14, 'AA0001FF', 'Citroen', 'yellow', 'universal', 8, 1);
+INSERT INTO Car VALUES(9, 'AA8954KK', 'Renault', 'green', 'kupe', 9, 1);
+INSERT INTO Car VALUES(10, 'AA0987JJ', 'Volkswagen', 'green', 'sedan', 10, 1);
+INSERT INTO Car VALUES(12, 'AA6786LL', 'Jeep', 'White', 'kupe', 12, 1);
+
+
+
+
+
+
+

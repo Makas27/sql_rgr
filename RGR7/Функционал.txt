@@ -1,0 +1,134 @@
+1.1
+
+CREATE VIEW Категорія_товару as SELECT Назва_товару, Назва_Категорії from Товар inner join Категорії on Товар.Id_Складу = Категорії.Id_Категорії
+SELECT * from Категорія_товару
+DROP VIEW if exists Категорія_товару 
+
+1.2
+
+CREATE VIEW Товари_на_складі as SELECT Назва_товару from Товар where ID_Складу = 1
+SELECT * from Товари_на_складі 
+
+DROP VIEW if exists Товари_на_складі
+
+2
+
+alter table Замовлення ADD Ідентифікатор_кількості tinyint NULL
+
+CREATE PROCEDURE Наявність_товару @Номер_замовлення INT as
+BEGIN
+	declare @Товарів_замовлено INT
+	declare @Номер_товару INT
+	declare @Товарів_на_складі INT 
+
+	set @Товарів_замовлено = (SELECT Кількість_товару from Замовлення where ID_Замовлення = @Номер_замовлення)
+	set @Номер_товару = (SELECT Id_Товару from Замовлення where Id_Замовлення = @Номер_замовлення)
+	set @Товарів_на_складі = (SELECT Кількість_товарів from Склад where ID_Складу = (SELECT ID_Складу from Товар where ID_Товару = @Номер_товару))
+
+	if (@Товарів_замовлено > @Товарів_на_складі) 
+	begin 
+		UPDATE Замовлення set Ідентифікатор_кількості = 0 where ID_Замовлення = @Номер_замовлення
+	end
+	else 
+	begin
+		UPDATE Замовлення set Ідентифікатор_кількості = 1 where ID_Замовлення = @Номер_замовлення
+	end
+END
+
+drop PROCEDURE Наявність_товару
+
+exec Наявність_товару 22
+
+-- create trigger Перевірка_кількості on Замовлення for insert as
+-- 	declare @Кількість INT
+-- 	set @Кількість = (select Id_Замовлення from inserted)
+-- 	exec Наявність_товару @Кількість
+
+-- INSERT INTO Замовлення VALUES(1488, 5, '2019-07-13', 0);
+-- INSERT INTO Замовлення VALUES(3, 7, '2019-07-13', 0);
+
+-- drop trigger Перевірка_кількості
+
+SELECT * FROM Замовлення
+
+3
+
+CREATE trigger Зміна_залишку on Замовлення for insert as
+	declare @Кількість_товару INT
+	declare @Кількість_товару_на_складі INT
+	declare @Товар INT
+	declare @Ідентифікатор tinyint
+
+	set @Кількість_товару = (select Кількість_товару from inserted)
+	set @Товар = (select ID_товару from inserted)
+	set @Кількість_товару_на_складі = (select Кількість_товарів from Склад where ID_Складу = (SELECT ID_Складу from Товар where ID_Товару = @Товар))
+	set @Ідентифікатор = (select Ідентифікатор_кількості from inserted)
+
+
+	if(@Ідентифікатор = 0)
+		begin 
+			Raiserror('Товару не достатньо на складі!!!!', 16, 1) with nowait
+		end
+	else 
+		begin 
+			update Склад set Кількість_товарів = (@Кількість_товару_на_складі - @Кількість_товару)
+				where ID_Складу = (SELECT ID_Складу from Товар where ID_Товару = @Товар)
+		end
+		
+
+select * from Склад where ID_Складу = 3
+select * from Замовлення
+select * from Товар 
+
+INSERT INTO Замовлення VALUES(5, 7, '2019-07-13', 1);
+
+4.1 
+
+--Триггер для подсчета залишка 
+
+create procedure Залишок_магазину @Номер_товару INT as
+begin
+	declare @Кількість_на_складі INT
+	declare @Одиниці_виміру VARCHAR(10)
+	declare @Залишок VARCHAR(32)
+
+	set @Кількість_на_складі = (select Кількість_товарів from Склад where ID_Складу = (select ID_Складу from Товар where ID_Товару = @Номер_товару))
+	set @Одиниці_виміру = (select Одиниці_виміру from Товар where ID_Товару = @Номер_товару)
+	set @Залишок = CONCAT(CONVERT(VARCHAR(32), @Кількість_на_складі), @Одиниці_виміру)
+
+	update Місце_зберігання set Залишок = @Залишок where ID_Товару = @Номер_товару
+end
+
+drop procedure Залишок_магазину
+
+select * from Місце_зберігання
+
+exec Залишок_магазину 1
+
+--Конец триггера
+
+Create view Наявність_товарів as select Назва_товару, Номер_стелажу, Номер_лінії, Залишок from Місце_зберігання inner join Товар on Місце_зберігання.Id_Товару = Товар.Id_Товару
+select * from Наявність_товарів
+
+4.2
+
+Create view Замовлені_товари as select Назва_Товару, Номер_стелажу, Номер_лінії, Кількість_товару from Замовлення 
+inner join 
+Товар on Замовлення.ID_Товару = Товар.ID_Товару
+inner join 
+Місце_зберігання on Замовлення.ID_Товару = Місце_зберігання.ID_Товару
+
+select * from Замовлені_товари
+
+4.3 
+
+CREATE VIEW Вага_замовлення as select Id_Замовлення, Кількість_товару from Замовлення
+select * from Вага_замовлення
+
+4.4
+
+CREATE VIEW Картка_товару as select Id_Складу, Номер_стелажу, Номер_лінії, Одиниці_виміру, Залишок 
+from Товар inner join Місце_зберігання on Товар.ID_Товару = Місце_зберігання.ID_Товару
+
+select * from Картка_товару
+

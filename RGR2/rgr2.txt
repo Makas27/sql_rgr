@@ -1,0 +1,293 @@
+CREATE TABLE Departments ( 
+	ID_Departmant int PRIMARY KEY IDENTITY,
+	Name_Departmant varchar(60) NOT NULL
+);
+CREATE TABLE Exam ( 
+	ID_exam int PRIMARY KEY IDENTITY,
+	Date_ex date,
+	ID_Group int NOT NULL,
+	ID_Type int NOT NULL,
+	ID_Professors int NOT NULL,
+	ID_Room int NOT NULL,
+	ID_Subject int NOT NULL
+);
+CREATE TABLE Groups ( 
+	ID_Group int PRIMARY KEY IDENTITY,
+	Name_Groups nvarchar(60) NOT NULL,
+	YearOfStart int NOT NULL,
+	ID_Department int NOT NULL
+);
+CREATE TABLE Professors ( 
+	ID_Professors int PRIMARY KEY IDENTITY,
+	Name_Surname nvarchar(50) NOT NULL,
+	ID_Rank int NOT NULL
+);
+CREATE TABLE Ranks ( 
+	ID_Rank int PRIMARY KEY IDENTITY,
+	Name_Ranks nvarchar(50) NOT NULL
+);
+CREATE TABLE Rooms ( 
+	ID_Room int PRIMARY KEY IDENTITY,
+	Number_Rooms nvarchar(10) NOT NULL
+);
+CREATE TABLE Subjects ( 
+	ID_Subject int PRIMARY KEY IDENTITY,
+	Name_Subjects nvarchar(50) NOT NULL
+);
+CREATE TABLE Types_ex ( 
+	ID_Type int PRIMARY KEY IDENTITY,
+	Name_Type nvarchar(10) NOT NULL)
+
+
+
+	ALTER TABLE Exam ADD CONSTRAINT key1 
+	FOREIGN KEY (ID_Group) REFERENCES Groups (ID_Group)
+	ON DELETE CASCADE ON UPDATE CASCADE
+;
+ALTER TABLE Exam ADD CONSTRAINT key2 
+	FOREIGN KEY (ID_Professors) REFERENCES Professors (ID_Professors)
+	ON DELETE CASCADE ON UPDATE CASCADE
+;
+ALTER TABLE Exam ADD CONSTRAINT key3
+	FOREIGN KEY (ID_Room) REFERENCES Rooms (ID_Room)
+	ON DELETE CASCADE ON UPDATE CASCADE
+;
+ALTER TABLE Exam ADD CONSTRAINT key4
+	FOREIGN KEY (ID_Subject) REFERENCES Subjects (ID_Subject)
+	ON DELETE CASCADE ON UPDATE CASCADE
+;
+ALTER TABLE Exam ADD CONSTRAINT key5 
+	FOREIGN KEY (Id_Type) REFERENCES Types_ex (ID_Type)
+	ON DELETE CASCADE ON UPDATE CASCADE
+;
+ALTER TABLE Groups ADD CONSTRAINT key6 
+	FOREIGN KEY (ID_Department) REFERENCES Departments (ID_Departmant)
+	ON DELETE CASCADE ON UPDATE CASCADE
+;
+ALTER TABLE Professors ADD CONSTRAINT key7
+	FOREIGN KEY (ID_Rank) REFERENCES Ranks (ID_Rank)
+	ON DELETE CASCADE ON UPDATE CASCADE
+;
+
+
+INSERT INTO Types_ex VALUES ('exam');
+INSERT INTO Types_ex VALUES ('advice');
+
+INSERT INTO Ranks VALUES ('teacher');
+INSERT INTO Ranks VALUES ('Professor');
+INSERT INTO Ranks VALUES ('deputy dean');
+
+INSERT INTO Professors VALUES('Karyakin Sadok',1);
+INSERT INTO Professors VALUES('Cheremisinov Martin',2);
+INSERT INTO Professors VALUES('Golosov Giaczint',3);
+INSERT INTO Professors VALUES('Razumovskiy Sila',1);
+INSERT INTO Professors VALUES('Golovczyn Nelid',2);
+INSERT INTO Professors VALUES('Pisarchuk Vladimir',3);
+INSERT INTO Professors VALUES('Shatilov Ivan',1);
+INSERT INTO Professors VALUES('Anisimov Severian',2);
+INSERT INTO Professors VALUES('Buturlin Nastasiy',3);
+INSERT INTO Professors VALUES('Zmiev Rostislav',2);
+
+INSERT INTO Departments VALUES ('Information Security');
+INSERT INTO Departments VALUES ('Applied math');
+INSERT INTO Departments VALUES ('applied Physics');
+INSERT INTO Departments VALUES ('MMSI');
+
+INSERT INTO Groups VALUES ('FB-71',2017,1);
+INSERT INTO Groups VALUES ('FB-72',2017,1);
+INSERT INTO Groups VALUES ('FB-73',2017,1);
+INSERT INTO Groups VALUES ('FB-74',2017,1);
+INSERT INTO Groups VALUES ('FE-71',2017,2);
+INSERT INTO Groups VALUES ('FF-71',2017,4);
+INSERT INTO Groups VALUES ('FF-72',2017,3);
+INSERT INTO Groups VALUES ('FI-71',2017,3);
+
+INSERT INTO Rooms VALUES ('112-7');
+INSERT INTO Rooms VALUES ('114-7');
+INSERT INTO Rooms VALUES ('116-7');
+INSERT INTO Rooms VALUES ('118-7');
+INSERT INTO Rooms VALUES ('211-11');
+INSERT INTO Rooms VALUES ('203-11');
+INSERT INTO Rooms VALUES ('415-16');
+INSERT INTO Rooms VALUES ('BF-1');
+INSERT INTO Rooms VALUES ('514-16');
+
+INSERT INTO Subjects VALUES ('Programming');
+INSERT INTO Subjects VALUES ('Higher mathematics');
+INSERT INTO Subjects VALUES ('Ukrainian language');
+INSERT INTO Subjects VALUES ('Psychology');
+INSERT INTO Subjects VALUES ('Crypt');
+INSERT INTO Subjects VALUES ('BD');
+INSERT INTO Subjects VALUES ('Physics');
+INSERT INTO Subjects VALUES ('Economy');
+INSERT INTO Subjects VALUES ('signals');
+INSERT INTO Subjects VALUES ('Philosophy');
+INSERT INTO Subjects VALUES ('English language');
+
+INSERT INTO Exam VALUES ('01-01-2020',1,2,1,1,1);
+INSERT INTO Exam VALUES ('01-02-2020',1,1,1,1,1);
+INSERT INTO Exam VALUES ('01-05-2020',1,2,2,5,2);
+INSERT INTO Exam VALUES ('01-06-2020',1,1,2,5,2);
+INSERT INTO Exam VALUES ('01-11-2020',1,2,3,4,3);
+INSERT INTO Exam VALUES ('01-12-2020',1,1,3,4,3);
+INSERT INTO Exam VALUES ('01-01-2020',2,2,4,1,4);
+INSERT INTO Exam VALUES ('01-02-2020',2,1,4,1,4);
+INSERT INTO Exam VALUES ('01-05-2020',3,2,5,5,5);
+INSERT INTO Exam VALUES ('01-06-2020',3,1,5,5,5);
+INSERT INTO Exam VALUES ('01-11-2020',6,2,6,4,6);
+INSERT INTO Exam VALUES ('01-12-2020',6,1,6,4,6);
+INSERT INTO Exam VALUES ('01-01-2020',5,2,7,1,7);
+INSERT INTO Exam VALUES ('01-02-2020',5,1,7,1,7);
+INSERT INTO Exam VALUES ('01-05-2020',7,2,8,5,8);
+INSERT INTO Exam VALUES ('01-06-2020',7,1,8,5,8);
+INSERT INTO Exam VALUES ('01-11-2020',7,2,9,4,9);
+INSERT INTO Exam VALUES ('01-12-2020',7,1,9,4,9);
+
+
+
+1.1 
+
+-- general --
+CREATE VIEW Exams
+AS
+SELECT Subjects.Name_Subjects, Groups.Name_Groups, Exam.Date_ex , Professors.Name_Surname,
+	Ranks.Name_Ranks, Rooms.Number_Rooms, Types_ex.Name_Type, Departments.Name_Departmant
+FROM dbo.Departments 
+INNER JOIN Groups ON Departments.ID_Departmant = Groups.ID_Department
+INNER JOIN Exam ON Groups.ID_Group = Exam.ID_exam
+INNER JOIN Professors ON Exam.ID_Professors = dbo.Professors.ID_Professors
+INNER JOIN Ranks ON Professors.ID_Rank = Ranks.ID_Rank 
+INNER JOIN Rooms ON Exam.ID_Room = Rooms.ID_Room 
+INNER JOIN Subjects ON Exam.ID_Subject = Subjects.ID_Subject 
+INNER JOIN Types_ex ON Exam.ID_Type = Types_ex.ID_Type
+
+
+-- 1.1 -- 
+CREATE PROCEDURE Schedule_from_department
+@Name nvarchar(60)
+AS	
+BEGIN
+	select Name_Subjects, Name_Groups, Date_ex, Name_Surname
+	from Exams
+	where Name_type = 'exam' and Name_Departmant = @Name
+END
+
+exec Schedule_from_department 'Information Security'
+
+DROP PROCEDURE Schedule_from_department
+
+1.2
+
+CREATE PROCEDURE Schedule_from_group
+@Name nvarchar(60)
+AS	
+BEGIN
+	select Name_Subjects, Name_Groups, Date_ex, Name_Surname
+	from Exams
+	where Name_type = 'exam' and Name_Groups = @Name
+END
+
+exec Schedule_from_group 'FB-72'
+
+DROP PROCEDURE Schedule_from_group
+
+2.1 
+
+CREATE PROCEDURE Check_3_days
+@Name nvarchar(50)
+AS
+BEGIN
+IF EXISTS(SELECT * FROM
+(
+SELECT DateDiff(DAY,[LastDate],Date_ex) o
+  FROM
+      (
+        SELECT Date_ex, LAG(Date_ex, 1) OVER (ORDER BY Date_ex) LastDate     
+          FROM Exams
+		  WHERE Name_Groups=@Name AND Name_Type='exam'
+      ) p) l WHERE o<4)  
+	  BEGIN
+	  PRINT('Проходить не менше трьох днів!');
+	  END
+	  ELSE
+	  BEGIN
+	  PRINT('Пройшло менше 3 днів');
+	  END
+	  
+END
+
+
+exec Check_3_days 'FB-72'
+
+
+DROP PROCEDURE Check_3_days
+
+2.2
+
+CREATE PROCEDURE Check_1_time
+AS
+BEGIN
+IF EXISTS(SELECT *
+  FROM
+      (
+        SELECT Count(*) [Count]
+          FROM Exams
+		  WHERE Name_Type='exam'
+		  GROUP BY Name_Surname
+      ) p
+	  WHERE [Count]>1)  
+	  BEGIN
+	  PRINT('У викладачів більше одного екзамена вдень!');
+	  END
+	  ELSE
+	  BEGIN
+	  PRINT('У викладачів нормальний розклад');
+	  END
+	  
+END
+
+exec Check_1_time
+
+DROP PROCEDURE Check_1_time
+
+2.3
+
+SELECT Name_Groups ,Count(*) [Count] FROM Exams WHERE Name_Type='exam'
+GROUP BY Name_Groups
+
+SELECT COUNT(*) [Gen_count]
+FROM Exams WHERE Name_Type='exam'
+
+3.1
+
+CREATE PROCEDURE Update_with_prof
+@old_date date,
+@prof nvarchar(50),
+@new_date date,
+@room nvarchar
+AS
+BEGIN
+        UPDATE exam
+		SET ID_Room = @room, Date_ex=@new_date
+		WHERE Date_ex=@old_date
+		AND 
+		(SELECT top 1 Professors.ID_Professors FROM Exam INNER JOIN Professors 
+		ON Professors.ID_Professors = Exam.ID_Professors WHERE Name_Surname = @prof) = Exam.ID_Professors
+		
+END
+
+exec Update_with_prof '2020-02-01', 'Karyakin Sadok', '2020-03-01', 1
+
+drop procedure Update_with_prof
+
+4.1
+
+SELECT * from Exams
+WHERE Name_Departmant='Information Security' AND Name_Type='exam'
+		order by Name_Ranks
+
+4.2
+
+SELECT Name_Surname,Name_Subjects,Date_ex as [Date_of_consul],Number_Rooms,
+LAG(Date_ex,1) OVER (ORDER BY Date_ex) Date_of_exam, LAG(Number_Rooms,1) OVER (ORDER BY Date_ex) Room2
+FROM Exams

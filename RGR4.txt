@@ -1,0 +1,205 @@
+create table Disc(
+ID_Disc int identity primary key,
+Name_Disc varchar(60),
+term_curs int)
+
+create table shedule(
+ID_shedule int identity primary key,
+day_shedule int,
+ID_aud int,
+time_shedule int,
+ID_Groups int,
+Id_teacher int)
+
+create Table Groups(
+ID_groups int identity primary key,
+Name_groups varchar(60))
+
+create Table aud(
+ID_aud int identity primary key,
+Name_aud varchar(60))
+
+create table kafedra(
+ID_kafedra int identity primary key,
+Name_kafedra varchar(60))
+
+create Table Teacher(
+ID_Teacher int identity primary key,
+name_surname varchar(60),
+ID_disc int,
+ID_Ranks int,
+ID_Post int,
+ID_kafedra int)
+
+create table Ranks(
+ID_Ranks int identity primary key,
+name_Ranks varchar(60))
+
+create table Post(
+ID_Post int identity primary key,
+name_Post varchar(60))
+
+Alter table  Teacher
+add constraint key1 foreign key(ID_disc)
+references Disc(Id_disc)
+
+Alter table  shedule
+add constraint key2 foreign key(ID_aud)
+references aud(ID_aud)
+
+Alter table  shedule
+add constraint key3 foreign key(ID_Groups)
+references Groups(ID_Groups)
+
+Alter table  shedule
+add constraint key4 foreign key(ID_teacher)
+references teacher(ID_teacher)
+
+Alter table  teacher
+add constraint key5 foreign key(ID_kafedra)
+references kafedra(ID_kafedra)
+
+Alter table  teacher
+add constraint key6 foreign key(ID_Ranks)
+references Ranks(ID_Ranks)
+
+Alter table  teacher
+add constraint key7 foreign key(ID_Post)
+references Post(ID_Post)
+
+insert into Groups values('FB-71')
+insert into Groups values('FB-72')
+insert into Groups values('FB-73')
+insert into Groups values('FB-74')
+
+insert into Disc values('BD',120)
+insert into Disc values('Crypt',180)
+insert into Disc values('WinApi',90)
+insert into Disc values('Math',100)
+insert into Disc values('Signali',40)
+insert into Disc values('English',40)
+
+Insert into kafedra values('Information Security')
+Insert into kafedra values('Applied math')
+Insert into kafedra values('applied Physics')
+Insert into kafedra values('MMSI')
+
+INSERT INTO aud VALUES ('112-7');
+INSERT INTO aud VALUES ('114-7');
+INSERT INTO aud VALUES ('116-7');
+INSERT INTO aud VALUES ('118-7');
+INSERT INTO aud VALUES ('211-11');
+INSERT INTO aud VALUES ('203-11');
+INSERT INTO aud VALUES ('415-16');
+INSERT INTO aud VALUES ('BF-1');
+INSERT INTO aud VALUES ('514-16');
+
+INSERT INTO Post VALUES ('teacher');
+INSERT INTO Post VALUES ('Professor');
+INSERT INTO Post VALUES ('docent');
+
+INSERT INTO Ranks VALUES ('candidate');
+INSERT INTO Ranks VALUES ('doctor'); 
+INSERT INTO Ranks VALUES ('graduate student');
+
+INSERT INTO Teacher VALUES('Karyakin Sadok', 1, 1, 1, 1);
+INSERT INTO Teacher VALUES('Cheremisinov Martin', 2, 3, 3, 2);
+INSERT INTO Teacher VALUES('Golosov Giaczint', 3, 2, 3, 3);
+INSERT INTO Teacher VALUES('Razumovskiy Sila', 4, 3, 2, 4);
+INSERT INTO Teacher VALUES('Golovczyn Nelid', 5, 3, 2, 1);
+INSERT INTO Teacher VALUES('Pisarchuk Vladimir', 6, 1, 1, 2);
+
+insert into shedule values(1, 1, 10, 1, 1)
+insert into shedule values(1, 1, 12, 2, 1)
+insert into shedule values(2, 2, 10, 3, 1)
+insert into shedule values(2, 3, 8, 4, 2)
+insert into shedule values(1, 4, 12, 1, 2) --
+insert into shedule values(1, 5, 14, 2, 2) --
+insert into shedule values(3, 6, 12, 3, 2) --
+insert into shedule values(4, 8, 8, 1, 3) 
+insert into shedule values(5, 9, 8, 2, 4)
+insert into shedule values(3, 2, 10, 3, 4)
+insert into shedule values(1, 5, 12, 4, 4)
+insert into shedule values(4, 6, 14, 1, 4)
+insert into shedule values(2, 7, 12, 2, 5)
+insert into shedule values(1, 8, 10, 3, 6)
+insert into shedule values(5, 1, 16, 4, 6)
+
+1.1
+
+Select Name_kafedra, name_surname, Name_Disc from Teacher
+inner join kafedra on kafedra.ID_kafedra = Teacher.ID_kafedra
+inner join Disc on Teacher.ID_disc = Disc.ID_Disc
+
+1.2
+
+create view Ranks_o as
+Select name_surname, name_Post, name_Ranks from Teacher
+inner join Post on Teacher.ID_Post = Post.ID_Post
+inner join Ranks on Teacher.ID_Ranks = Ranks.ID_Ranks
+where Teacher.ID_Post <> Teacher.ID_Ranks
+
+select * from Ranks_o
+
+
+2
+
+CREATE PROCEDURE Check_day @day int
+AS
+BEGIN
+if exists(Select * from (Select count(ID_shedule) as cout from shedule
+where day_shedule = @day group by Id_teacher) p where cout >3)
+BEGIN
+	  PRINT('У викладачів більше 3х пар в день вдень!');
+END
+	  ELSE
+BEGIN
+	  PRINT('У викладачів нормальний розклад');
+END
+	  
+END
+
+exec Check_day 4
+
+
+3
+
+CREATE PROCEDURE New_rozklad @ID_shedule int, @aud int, @day INT, @time int AS
+BEGIN 
+	UPDATE shedule SET ID_aud = @aud, day_shedule = @day, time_shedule = @time
+	WHERE ID_shedule = @ID_shedule
+END
+
+exec New_rozklad 13, 6, 1 , 11
+
+4.1
+
+Select name_surname, Name_aud, day_shedule, time_shedule, Name_groups from shedule
+inner join aud on shedule.ID_aud = aud.ID_aud
+inner join Groups on shedule.ID_Groups = Groups.ID_groups
+inner join Teacher on shedule.Id_teacher = Teacher.ID_Teacher
+Where shedule.ID_Groups = 1
+
+4.2
+
+select name_Post, count(Teacher.ID_Post) as cout from Teacher
+inner join Post on Teacher.ID_Post = Post.ID_Post
+group by name_Post
+
+4.3
+
+Select day_shedule, Name_aud, time_shedule, Name_groups, name_surname, Name_kafedra from shedule
+inner join Teacher on shedule.Id_teacher = Teacher.ID_Teacher
+inner join kafedra on Teacher.ID_kafedra = kafedra.ID_kafedra
+inner join aud on shedule.ID_aud = aud.ID_aud
+inner join Groups on shedule.ID_Groups = Groups.ID_groups
+where kafedra.ID_kafedra = 2
+
+4.4
+
+Select Name_kafedra,name_surname, Name_Disc,term_curs from Teacher
+inner join Disc on Teacher.ID_disc = Disc.ID_Disc
+inner join kafedra on kafedra.ID_kafedra = Teacher.ID_kafedra
+
+
+

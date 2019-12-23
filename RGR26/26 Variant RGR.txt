@@ -1,0 +1,82 @@
+1.1
+
+CREATE VIEW Owner_car_info as SELECT Name_Surname, Car_numbers, Car_Model, Category FROM Owner_car
+inner join Car on Car.ID_Owner_car = Owner_car.ID_Owner_car
+inner join driver_license on driver_license.ID_driver_license = Owner_car.ID_driver_license
+
+SELECT * FROM Owner_car_info
+
+DROP VIEW Owner_car_info
+
+1.2 
+
+SELECT Name_surname, DateOfBirthday, engine_number, Date_of_inspection, Payment_date from Owner_car 
+inner join Car on Car.ID_Owner_car = Owner_car.ID_Owner_car
+inner join Notice on Car.Id_Notice = Notice.Id_Notice
+where Car_Model = 'Peugeout' and Car_Color = 'blue' and Car_Typ = 'minivan' 
+order by Name_surname
+
+1.3
+
+CREATE VIEW Cars_amount AS SELECT Car_Model, COUNT(Owner_car.ID_Owner_car) as Cars_amount from Owner_car
+inner join Car on Car.ID_Owner_car = Owner_car.ID_Owner_car
+group by Car_Model
+
+SELECT * FROM Cars_amount
+
+DROP VIEW Cars_amount
+
+2
+
+update GAI set Sum_debt = (select sum(Sum_debt_Notice) from notice)
+
+select Sum_debt from GAI
+
+3.1 
+
+CREATE PROCEDURE new_owner @Car_id INT, @Owner INT AS
+BEGIN
+	UPDATE Car SET ID_Owner_car = @Owner where Car.ID_Car = @Car_id
+END
+
+exec new_owner 5, 5
+
+DROP PROCEDURE new_owner
+
+3.2
+
+CREATE PROCEDURE del_car @Car_id INT AS
+BEGIN
+	DELETE FROM Car WHERE Car.ID_Car = @Car_id
+END
+
+exec del_car 15
+
+DROP PROCEDURE del_car
+
+4.1
+
+CREATE PROCEDURE Search_owner @number VARCHAR(10) as
+BEGIN
+	SELECT Name_Surname, DateOfBirthday, Category, Car_Model, Car_Color, Car_Typ,
+	Next_Date_of_inspection, Payment_date, Sum_debt_Notice FROM Owner_car 
+	inner join Car on Owner_car.ID_Owner_car = Car.ID_Owner_car 
+	inner join Driver_license on Driver_license.ID_driver_license = Owner_car.ID_driver_license
+	inner join Notice on Car.Id_Notice = Notice.ID_Notice
+	WHERE Car_numbers = @number
+END
+
+exec Search_owner 'AA1111BB'
+
+DROP PROCEDURE Search_owner
+
+4.2
+
+CREATE VIEW Debit AS select Name_Surname, DateOfBirthday, Payment_date, Sum_debt_Notice from Owner_car
+inner join Car on Car.ID_Owner_car = Owner_car.ID_Owner_car
+inner join Notice on Notice.Id_Notice = Car.Id_Notice
+where Sum_debt_Notice <> 0 or Next_Date_of_inspection < GETDATE()
+
+SELECT * FROM Debit
+
+DROP VIEW Debit
